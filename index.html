@@ -1,0 +1,159 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+		<title>fressound timeline</title>
+		<script type="text/javascript" src="freesound.js"></script>
+	</head>
+	<body>
+		<script type="text/javascript">
+			window.onload = function(){
+				freesound.setToken("d31c795be3f70f7f04b21aeca4c5b48a599db6e9");
+			};
+
+			var PLAYERS = [];
+			
+			function playSound(name,url){
+				console.log("Creating sound: " + name)
+
+				var a = new Audio(url);
+				PLAYERS.push(a);
+
+				// TODO: would be nice to pan randomly
+				document.getElementById("respSearch").innerHTML = "Playing: " + name;
+	    		a.play();
+	    		a.onended = function() {
+	    			// Loop and display
+	    			document.getElementById("respSearch").innerHTML = "Playing: " + name;
+	    			a.play();
+				};
+				if (document.getElementById("panic2").offsetParent !== null){
+					document.getElementById("panic2").style.display = 'none';
+					document.getElementById("panic1").style.display = 'block';
+				}
+			}
+			
+			function search(){
+
+				stopAllSounds();
+				
+				var month = document.getElementById('month').value;
+				var year = document.getElementById('year').value;
+				var q = "";
+				var p = 1;
+				
+				var f = "created:[" + year + "-" + month + "-1T00:00:00Z TO " + get_next_year(year,month) + "-" + get_next_month(month) + "-01T00:00:00Z] duration:[0.0 TO 60]";
+				if (document.getElementById('alternative').value == "on"){
+					var s = "rating_desc";
+				}else{
+					var s = "downloads_desc";
+				}
+
+				var fields = "id,name,previews"
+				freesound.textSearch(q, {page:p, filter:f, sort:s, fields:fields},
+		            function(data){
+		            	var sounds = data.results;
+		            	console.log("Resuls received")
+						if (sounds.length == 0){
+							document.getElementById("respSearch").innerHTML = "";
+							document.getElementById("respSearch").innerHTML = "No results...";
+						}else{
+							document.getElementById("respSearch").innerHTML = "";
+							document.getElementById("respSearch").innerHTML = "Loading sounds... will begin playing at any moment...";
+							for (i =0;i<sounds.length;i++){  
+			                    var snd = sounds[i];
+			                    playSound(snd.name, snd.previews['preview-hq-mp3'])	 // ogg seems to fail on safari...
+			                }
+						}
+		                
+		            },function(){ 
+		            	document.getElementById("respSearch").innerHTML = "Error while searching..."; 
+		            }
+		        );
+				console.log("Waiting for results...")
+				document.getElementById("respSearch").innerHTML = "";
+				document.getElementById("respSearch").innerHTML = "Waiting for results...";
+			}
+			
+			function next(){
+				var month = document.getElementById('month').value;
+				var year = document.getElementById('year').value;
+				document.getElementById('month').value = get_next_month(month)
+				document.getElementById('year').value = get_next_year(year,month)
+				search()
+			}
+			
+			function previous(){
+				var month = document.getElementById('month').value;
+				var year = document.getElementById('year').value;
+				document.getElementById('month').value = get_previous_month(month)
+				document.getElementById('year').value = get_previous_year(year,month)
+				search()
+			}
+			
+			
+			function get_next_month(month){
+				if (parseInt(month,10) >= 12){
+					return "1"
+				}else{
+					return (parseInt(month,10) + 1).toString()
+				}
+			}
+			
+			function get_next_year(year,month){
+				if (parseInt(month,10) >= 12){
+					return (parseInt(year,10) + 1).toString()
+				}else{
+					return year
+				}
+			}
+			
+			function get_previous_month(month){
+				if (parseInt(month,10) <= 1){
+					return "12"
+				}else{
+					return (parseInt(month,10) - 1).toString()
+				}
+			}
+			
+			function get_previous_year(year,month){
+				if (parseInt(month,10) <= 1){
+					return (parseInt(year,10) - 1).toString()
+				}else{
+					return year
+				}
+			}
+			
+			function stopAllSounds(){			
+	  			for(i=0; i<PLAYERS.length; i++) PLAYERS[i].pause();
+	  			PLAYERS = [];
+				document.getElementById("panic1").style.display = 'none';
+				document.getElementById("panic2").style.display = 'block';
+				document.getElementById("respSearch").innerHTML = "";
+			}
+		</script>
+		
+		<h1 id="header" style="font-family:Helvetica, Arial; text-align: center">free<span style="color:#F31C36">sound</span> timeline</h1>
+		<div style="text-align:center">
+		<span style="font-family:Helvetica, Arial;font-size: 12px;">enter month (1-12):</span> <input type="text" id="month" value="8" size=2 maxlength=2>
+		<br>
+		<span style="font-family:Helvetica, Arial;font-size: 12px">enter year (2005-now):</span> <input type="text" id="year" value="2011" size=4 maxlength=4>
+		<br>
+		<input type="button" id="search" value="go!" onclick="search()">
+		<input type="checkbox" id="alternative">
+		<br>
+		<input type="button" id="search" value="<<" onclick="previous()"><input type="button" id="search" value=">>" onclick="next()">
+		<br><br>
+		<span id="respSearch" style="font-family:Helvetica, Arial;font-size: 12px"></span>
+		<br>
+		<br>
+		<div id="panic1" style="display:none">
+		<input type="button" id="stopAllSounds" value="panic!" onclick="stopAllSounds()">
+		</div>
+		<div id="panic2">
+		<span style="font-family:Helvetica, Arial;font-size: 12px">no need for panic button... yet!</span>
+		</div>
+		
+		</div>
+	</body>
+</html>

@@ -4,29 +4,33 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 		<title>fressound timeline</title>
 		<script type="text/javascript" src="freesound.js"></script>
+		<script src="audioengine.js"></script>
 	</head>
 	<body>
 		<script type="text/javascript">
+			var audio_manager = new AudioManager();
+			var PLAYERS = [];
+
 			window.onload = function(){
 				freesound.setToken("d31c795be3f70f7f04b21aeca4c5b48a599db6e9");
-			};
-
-			var PLAYERS = [];
+				startAudioContext();
+			};			
 			
-			function playSound(name,url){
+			function myPlaySound(name,url){
 				console.log("Creating sound: " + name)
 
-				var a = new Audio(url);
-				PLAYERS.push(a);
+				
+				//PLAYERS.push(a);
 
 				// TODO: would be nice to pan randomly
 				document.getElementById("respSearch").innerHTML = "Playing: " + name;
-	    		a.play();
-	    		a.onended = function() {
-	    			// Loop and display
-	    			document.getElementById("respSearch").innerHTML = "Playing: " + name;
-	    			a.play();
-				};
+				audio_manager.loadSound(name, url, function(name){
+					audio_manager.playSoundByName(name);
+				});
+				// TODO: play on loop and display text
+				// TODO: implement stop all sounds
+
+
 				if (document.getElementById("panic2").offsetParent !== null){
 					document.getElementById("panic2").style.display = 'none';
 					document.getElementById("panic1").style.display = 'block';
@@ -62,7 +66,7 @@
 							document.getElementById("respSearch").innerHTML = "Loading sounds... will begin playing at any moment...";
 							for (i =0;i<sounds.length;i++){  
 			                    var snd = sounds[i];
-			                    playSound(snd.name, snd.previews['preview-hq-mp3'])	 // ogg seems to fail on safari...
+			                    myPlaySound(snd.name, snd.previews['preview-hq-mp3'])	 // ogg seems to fail on safari...
 			                }
 						}
 		                

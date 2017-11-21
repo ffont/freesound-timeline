@@ -43,12 +43,12 @@
 				var p = 1;
 				
 				var f = "created:[" + year + "-" + month + "-1T00:00:00Z TO " + get_next_year(year,month) + "-" + get_next_month(month) + "-01T00:00:00Z] duration:[0.0 TO 60]";
-				if (document.getElementById('alternative').value == "on"){
+				if (!document.getElementById('alternative').checked){
 					var s = "rating_desc";
 				}else{
 					var s = "downloads_desc";
 				}
-
+				
 				var fields = "id,name,previews"
 				freesound.textSearch(q, {page:p, filter:f, sort:s, fields:fields},
 		            function(data){
@@ -132,28 +132,33 @@
 				document.getElementById("respSearch").innerHTML = "";
 			}
 		</script>
-		
+		<br>
 		<h1 id="header" style="font-family:Helvetica, Arial; text-align: center">free<span style="color:#F31C36">sound</span> timeline</h1>
-		<div style="text-align:center">
-		<span style="font-family:Helvetica, Arial;font-size: 12px;">enter month (1-12):</span> <input type="text" id="month" value="8" size=2 maxlength=2>
-		<br>
-		<span style="font-family:Helvetica, Arial;font-size: 12px">enter year (2005-now):</span> <input type="text" id="year" value="2011" size=4 maxlength=4>
-		<br>
-		<input type="button" id="search" value="go!" onclick="search()">
-		<input type="checkbox" id="alternative">
-		<br>
-		<input type="button" id="search" value="<<" onclick="previous()"><input type="button" id="search" value=">>" onclick="next()">
-		<br><br>
-		<span id="respSearch" style="font-family:Helvetica, Arial;font-size: 12px"></span>
-		<br>
-		<br>
-		<div id="panic1" style="display:none">
-		<input type="button" id="stopAllSounds" value="panic!" onclick="stopAllSounds()">
-		</div>
-		<div id="panic2">
-		<span style="font-family:Helvetica, Arial;font-size: 12px">no need for panic button... yet!</span>
-		</div>
-		
+		<div style="text-align:center;font-family:Helvetica, Arial;font-size:12px">
+			enter month (1-12): <input type="text" id="month" value="8" size=2 maxlength=2>
+			<br>
+			enter year (2005-now): <input type="text" id="year" value="2011" size=4 maxlength=4>
+			<br>
+			<input type="button" id="search" value="go!" onclick="search()">
+			<input type="checkbox" id="alternative">
+			<br>
+			<input type="button" id="search" value="<<" onclick="previous()"><input type="button" id="search" value=">>" onclick="next()">
+			<br><br>
+			<span id="respSearch"></span>
+			<br>
+			<br>
+			<div id="panic1" style="display:none">
+				<input type="button" id="stopAllSounds" value="panic!" onclick="stopAllSounds()">
+			</div>
+			<div id="panic2">
+				no need for panic button... yet!
+			</div>
+			<br>
+			<br>
+			<div style="max-width:800px;display:inline-block;color:gray;">	
+				This is a very simple and stupid hack that gets the most popular sounds in <a href="freesound.org" target="_blank">Freesound</a> for a given
+				year and month and plays them all at once (in loop). Set the checkbox on for an alternative "measure" of popularity. This hack was originally implemented in 2011 when I was starting to learn about web technologies. It has been recently updated to use Freesound APIv2 and the Audio object, but besides that the bad code has been left intact. Want to contribute? visit the <a href="http://github.com/ffont/freesound-timeline" target="_blank">code repository</a>.
+			</div>
 		</div>
 	</body>
 </html>

@@ -9,17 +9,37 @@
 	<body>
 		<script type="text/javascript">
 
-			window.onload = function(){
-				freesound.setToken("d31c795be3f70f7f04b21aeca4c5b48a599db6e9");
-			};
+			function getParameterByName(name, url) {
+				// from https://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
+			    if (!url) url = window.location.href;
+			    name = name.replace(/[\[\]]/g, "\\$&");
+			    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+			        results = regex.exec(url);
+			    if (!results) return undefined;
+			    if (!results[2]) return '';
+			    return decodeURIComponent(results[2].replace(/\+/g, " "));
+			}
 
 			function randomBetween(min, max) {
+				// from https://stackoverflow.com/questions/4959975/generate-random-number-between-two-numbers-in-javascript
 			    if (min < 0) {
 			        return min + Math.random() * (Math.abs(min)+max);
 			    }else {
 			        return min + Math.random() * max;
 			    }
 			}
+
+			window.onload = function(){
+				freesound.setToken("d31c795be3f70f7f04b21aeca4c5b48a599db6e9");
+
+				// Set month and year from query string (if present)
+				var month = getParameterByName('month');
+				var year = getParameterByName('year');
+				if ((month !== undefined) && (year !== undefined)){
+					document.getElementById('month').value = month;
+					document.getElementById('year').value = year;
+				}
+			};
 
 			function playSound(name,url){				
 
@@ -161,7 +181,7 @@
 			<br>
 			<div style="max-width:800px;display:inline-block;color:gray;">	
 				This is a very simple and stupid hack that gets the most popular sounds in <a href="freesound.org" target="_blank">Freesound</a> for a given
-				year and month and plays them all at once (in loop). Set the checkbox on for an alternative "measure" of popularity. This hack was originally implemented in 2011 when I was starting to learn about web technologies. It has been recently updated to use Freesound APIv2 and the Audio object, but besides that the bad code has been left intact. Want to contribute? visit the <a href="http://github.com/ffont/freesound-timeline" target="_blank">code repository</a>.
+				year and month and plays them all at once (in loop). Set the checkbox on for an alternative "measure" of popularity. This hack was originally implemented in 2011 when I was starting to learn about web technologies. It has been recently updated to use Freesound APIv2 and Web Audio API (with random HRTF panning for each sound!), but besides that the bad code has been left intact. Want to contribute? visit the <a href="http://github.com/ffont/freesound-timeline" target="_blank">code repository</a>.
 			</div>
 		</div>
 	</body>

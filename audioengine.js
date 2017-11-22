@@ -8,7 +8,7 @@
 // If playing a sound which was already played in the future, the AudioManager
 // object will keep the buffer and reuse the data.
 
-var audioengine_verbose = false;
+var audioengine_verbose = true;
 function log(message) {
   if (audioengine_verbose){
     console.log(message)
@@ -24,13 +24,38 @@ function startAudioContext(){
       context.createGain = context.createGainNode;
     context.gainNode = context.createGain();
     context.gainNode.connect(context.destination);
+    context.listener.setOrientation(0, 0, -1, 0, 1, 0); // Set default listener orientation at the centre
 }
 
-function playBuffer(buffer, time) {
+function playBuffer(buffer, time, options) {
   const source = context.createBufferSource();
   source.buffer = buffer;
-  source.connect(context.gainNode);
+
+  connected = false;
+  if (options !== undefined){
+    if (options.loop) {
+      source.loop = options.loop;
+    } 
+    if (options.onended) {
+      source.onended = options.onended;
+    }  
+    if (options.panHRTF) {
+      const panner = context.createPanner();
+      panner.panningModel = "HRTF"
+      panner.distanceModel = "inverse"
+      panner.setPosition(options.panHRTF.x, options.panHRTF.y, options.panHRTF.z);
+      source.connect(panner);
+      panner.connect(context.gainNode);
+      connected = true;
+    }
+  }
+
+  if (!connected){
+    // If source was not connected to master gain node because of options, connect now
+    source.connect(context.gainNode);
+  }
   source.start(time);
+  return source;
 }
 
 function loadSounds(obj, soundMap, callback) {
@@ -117,23 +142,25 @@ AudioManager.prototype.loadSound = function(url, onLoadedCallback) {
   });
 }
 
-AudioManager.prototype.playBufferByName = function(name, time) {
+var BUFFER_NODES = [];
+AudioManager.prototype.playBufferByName = function(name, time, options) {
   log('Playing: ' + name);
   if (time === undefined){ time = 0; }
   if (name in this){
-    playBuffer(this[name], time);
+    var buffer_node = playBuffer(this[name], time, options);
+    BUFFER_NODES.push(buffer_node)
   } else {
     log('Error: "' + name + '" buffer not loaded!')
   }
 }
 
-AudioManager.prototype.playSoundFromURL = function(url, time) {
+AudioManager.prototype.playSoundFromURL = function(url, time, options) {
   if (time === undefined){ time = 0; }
   if (url in this){ // If sound is already loaded, just play it
-    AudioManager.prototype.playBufferByName(url, time);
+    AudioManager.prototype.playBufferByName(url, time, options);
   } else { // If sound has not been loaded, load it and play afterwards
     AudioManager.prototype.loadSound(url, function(){
-      AudioManager.prototype.playBufferByName(url, time);
+      AudioManager.prototype.playBufferByName(url, time, options);
     })  
   }
 }
@@ -146,6 +173,16 @@ AudioManager.prototype.setMainVolume = function(value) {
     value = 0.0;
   }
   context.gainNode.gain.value = value;
+}
+
+AudioManager.prototype.stopAllBuffers = function(disableOnEnded) {
+  for(i=0; i<BUFFER_NODES.length; i++) {
+    if (disableOnEnded) {
+      BUFFER_NODES[i].onended = undefined; // Set onended call to undefined just in case it is set  
+    }
+    BUFFER_NODES[i].stop();
+  }
+  BUFFER_NODES = [];
 }
 
 // Initialize things

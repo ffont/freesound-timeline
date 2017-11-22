@@ -8,23 +8,30 @@
 	</head>
 	<body>
 		<script type="text/javascript">
-			var PLAYERS = [];
 
 			window.onload = function(){
 				freesound.setToken("d31c795be3f70f7f04b21aeca4c5b48a599db6e9");
-			};			
-			
-			function myPlaySound(name,url){				
-				//PLAYERS.push(a);
+			};
 
-				// TODO: would be nice to pan randomly
+			function randomBetween(min, max) {
+			    if (min < 0) {
+			        return min + Math.random() * (Math.abs(min)+max);
+			    }else {
+			        return min + Math.random() * max;
+			    }
+			}
+
+			function playSound(name,url){				
+
 				document.getElementById("respSearch").innerHTML = "Playing: " + name;
-				am.playSoundFromURL(url);
+				am.playSoundFromURL(url, 0, {
+					panHRTF: {x:randomBetween(-1.0, 1.0), y:randomBetween(-2.0, 2.0), z:randomBetween(-2.0, 2.0) },
+					onended: function(event){
+						playSound(name, url);  // On end, play again the sound
+						// NOTE: we don't use Web Audio API loop prop here as it does not trigger onended event
+					}
+				});
 				
-				// TODO: play on loop and display text
-				// TODO: implement stop all sounds
-
-
 				if (document.getElementById("panic2").offsetParent !== null){
 					document.getElementById("panic2").style.display = 'none';
 					document.getElementById("panic1").style.display = 'block';
@@ -60,7 +67,7 @@
 							document.getElementById("respSearch").innerHTML = "Loading sounds... will begin playing at any moment...";
 							for (i =0;i<sounds.length;i++){  
 			                    var snd = sounds[i];
-			                    myPlaySound(snd.name, snd.previews['preview-hq-mp3'])	 // ogg seems to fail on safari...
+			                    playSound(snd.name, snd.previews['preview-hq-mp3'])	 // ogg seems to fail on safari...
 			                }
 						}
 		                
@@ -123,8 +130,7 @@
 			}
 			
 			function stopAllSounds(){			
-	  			for(i=0; i<PLAYERS.length; i++) PLAYERS[i].pause();
-	  			PLAYERS = [];
+	  			am.stopAllBuffers(disableOnEnded=true);
 				document.getElementById("panic1").style.display = 'none';
 				document.getElementById("panic2").style.display = 'block';
 				document.getElementById("respSearch").innerHTML = "";

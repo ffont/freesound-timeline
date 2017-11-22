@@ -9,17 +9,6 @@
 	<body>
 		<script type="text/javascript">
 
-			function getParameterByName(name, url) {
-				// from https://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
-			    if (!url) url = window.location.href;
-			    name = name.replace(/[\[\]]/g, "\\$&");
-			    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
-			        results = regex.exec(url);
-			    if (!results) return undefined;
-			    if (!results[2]) return '';
-			    return decodeURIComponent(results[2].replace(/\+/g, " "));
-			}
-
 			function randomBetween(min, max) {
 				// from https://stackoverflow.com/questions/4959975/generate-random-number-between-two-numbers-in-javascript
 			    if (min < 0) {
@@ -32,12 +21,20 @@
 			window.onload = function(){
 				freesound.setToken("d31c795be3f70f7f04b21aeca4c5b48a599db6e9");
 
-				// Set month and year from query string (if present)
-				var month = getParameterByName('month');
-				var year = getParameterByName('year');
+				// Set month, year and popularity measure from hash (if present)
+				var hash = window.location.hash;
+				hash = hash.slice(1,hash.length).split(',');
+
+				var month = hash[0];
+				var year = hash[1];
+				var alternative = hash[2];
+				
 				if ((month !== undefined) && (year !== undefined)){
 					document.getElementById('month').value = month;
 					document.getElementById('year').value = year;
+				}
+				if (alternative == 'true') {
+					document.getElementById("alternative").checked = true;
 				}
 			};
 
@@ -61,18 +58,21 @@
 			function search(){
 
 				stopAllSounds();
-				
+
 				var month = document.getElementById('month').value;
 				var year = document.getElementById('year').value;
+
 				var q = "";
 				var p = 1;
-				
 				var f = "created:[" + year + "-" + month + "-1T00:00:00Z TO " + get_next_year(year,month) + "-" + get_next_month(month) + "-01T00:00:00Z] duration:[0.0 TO 60]";
 				if (!document.getElementById('alternative').checked){
 					var s = "rating_desc";
 				}else{
 					var s = "downloads_desc";
 				}
+
+				var hash = month + ',' + year + ',' + document.getElementById('alternative').checked;
+				parent.location.hash = hash;
 				
 				var fields = "id,name,previews"
 				freesound.textSearch(q, {page:p, filter:f, sort:s, fields:fields},

@@ -92,6 +92,7 @@
 			function search(){
 
 				stopAllSounds();
+				document.getElementById('attributionList').innerHTML = '';
 
 				var month = document.getElementById('month').value;
 				var year = document.getElementById('year').value;
@@ -107,7 +108,7 @@
 
 				setHash();
 				
-				var fields = "id,name,previews"
+				var fields = "id,name,previews,username,license,url"
 				freesound.textSearch(q, {page:p, filter:f, sort:s, fields:fields},
 		            function(data){
 		            	var sounds = data.results;
@@ -118,9 +119,17 @@
 						}else{
 							document.getElementById("respSearch").innerHTML = "";
 							document.getElementById("respSearch").innerHTML = "Loading sounds... will begin playing at any moment...";
+
+							document.getElementById('attributionList').innerHTML = 'Sounds used: <br><br>';
 							for (i =0;i<sounds.length;i++){  
 			                    var snd = sounds[i];
-			                    playSound(snd.name, snd.previews['preview-hq-mp3'])	 // ogg seems to fail on safari...
+			                    var label = '<a href="' + snd.url + '" target="_blank">' + snd.name + '</a> by <b>' + snd.username + '</b>';
+			                    
+			                    playSound(label, snd.previews['preview-hq-mp3'])	 // ogg seems to fail on safari...
+
+			                    // Add attribution
+			                    document.getElementById('attributionList').innerHTML += 
+			                    	label + ' (<a href="' + snd.license + '" target="_blank">' + snd.license + '</a>)<br>'
 			                }
 						}
 		                
@@ -202,7 +211,7 @@
 			<br>
 			<input type="button" id="search" value="<<" onclick="previous()"><input type="button" id="search" value=">>" onclick="next()">
 			<br><br>
-			<span id="respSearch"></span>
+			<div id="respSearch"></div>
 			<br>
 			<br>
 			<div id="panic1" style="display:none">
@@ -210,6 +219,10 @@
 			</div>
 			<div id="panic2">
 				no need for panic button... yet!
+			</div>
+			<br>
+			<br>
+			<div id="attributionList">
 			</div>
 			<br>
 			<br>

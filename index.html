@@ -9,6 +9,9 @@
 	<body>
 		<script type="text/javascript">
 
+			var soundscape_compleixty = 1.0;
+			var soundscape_complexity_interval = 3000;
+
 			function randomBetween(min, max) {
 				// from https://stackoverflow.com/questions/4959975/generate-random-number-between-two-numbers-in-javascript
 			    if (min < 0) {
@@ -18,9 +21,7 @@
 			    }
 			}
 
-			window.onload = function(){
-				freesound.setToken("d31c795be3f70f7f04b21aeca4c5b48a599db6e9");
-
+			function parseHash(){
 				// Set month, year and popularity measure from hash (if present)
 				var hash = window.location.hash;
 				hash = hash.slice(1,hash.length).split(',');
@@ -28,6 +29,7 @@
 				var month = hash[0];
 				var year = hash[1];
 				var alternative = hash[2];
+				var complexity = hash[3];
 				
 				if ((month !== undefined) && (year !== undefined)){
 					document.getElementById('month').value = month;
@@ -36,23 +38,55 @@
 				if (alternative == 'true') {
 					document.getElementById("alternative").checked = true;
 				}
+				if (complexity) {
+					document.getElementById("complexity").value = complexity;	
+				}
+			}
+
+			function setHash(){
+				var hash = document.getElementById('month').value + ',' + 
+						   document.getElementById('year').value + ',' + 
+						   document.getElementById('alternative').checked + ',' +
+						   document.getElementById("complexity").value
+						   ;
+				parent.location.hash = hash;
+			}
+
+			window.onload = function(){
+				freesound.setToken("d31c795be3f70f7f04b21aeca4c5b48a599db6e9");
+				parseHash();
 			};
 
-			function playSound(name,url){				
+			function playSound(name,url){
 
-				document.getElementById("respSearch").innerHTML = "Playing: " + name;
-				am.playSoundFromURL(url, 0, {
-					panHRTF: {x:randomBetween(-1.0, 1.0), y:randomBetween(-2.0, 2.0), z:randomBetween(-2.0, 2.0) },
-					onended: function(event){
-						playSound(name, url);  // On end, play again the sound
-						// NOTE: we don't use Web Audio API loop prop here as it does not trigger onended event
+				// Only play sound if a random number is above a specific probability, otherwise try
+				// again after some time.
+				if (Math.random() >= (1.0 - soundscape_compleixty)) {
+					document.getElementById("respSearch").innerHTML = "Playing: " + name;
+					am.playSoundFromURL(url, 0, {
+						panHRTF: {x:randomBetween(-1.0, 1.0), y:randomBetween(-2.0, 2.0), z:randomBetween(-2.0, 2.0) },
+						onended: function(event){
+							playSound(name, url);  // On end, play again the sound
+							// NOTE: we don't use Web Audio API loop prop here as it does not trigger onended event
+						}
+					});
+					if (document.getElementById("panic2").offsetParent !== null){
+						document.getElementById("panic2").style.display = 'none';
+						document.getElementById("panic1").style.display = 'block';
 					}
-				});
-				
-				if (document.getElementById("panic2").offsetParent !== null){
-					document.getElementById("panic2").style.display = 'none';
-					document.getElementById("panic1").style.display = 'block';
-				}
+
+				} else {
+					setTimeout(function(){
+						playSound(name, url);
+					}, soundscape_complexity_interval);
+				}	
+			}
+
+			function stopAllSounds(){			
+	  			am.stopAllBuffers(disableOnEnded=true);
+				document.getElementById("panic1").style.display = 'none';
+				document.getElementById("panic2").style.display = 'block';
+				document.getElementById("respSearch").innerHTML = "";
 			}
 			
 			function search(){
@@ -71,8 +105,7 @@
 					var s = "downloads_desc";
 				}
 
-				var hash = month + ',' + year + ',' + document.getElementById('alternative').checked;
-				parent.location.hash = hash;
+				setHash();
 				
 				var fields = "id,name,previews"
 				freesound.textSearch(q, {page:p, filter:f, sort:s, fields:fields},
@@ -148,13 +181,12 @@
 					return year
 				}
 			}
-			
-			function stopAllSounds(){			
-	  			am.stopAllBuffers(disableOnEnded=true);
-				document.getElementById("panic1").style.display = 'none';
-				document.getElementById("panic2").style.display = 'block';
-				document.getElementById("respSearch").innerHTML = "";
+
+			function setComplexity(){
+				var value = document.getElementById('complexity').value;
+				soundscape_compleixty = value;
 			}
+
 		</script>
 		<br>
 		<h1 id="header" style="font-family:Helvetica, Arial; text-align: center">free<span style="color:#F31C36">sound</span> timeline</h1>
@@ -162,6 +194,8 @@
 			enter month (1-12): <input type="text" id="month" value="8" size=2 maxlength=2>
 			<br>
 			enter year (2005-now): <input type="text" id="year" value="2011" size=4 maxlength=4>
+			<br>
+			complexity: <input id="complexity" type="range" min=0.05 max=1.0 step='.05' value='1.0' onchange="setComplexity()">
 			<br>
 			<input type="button" id="search" value="go!" onclick="search()">
 			<input type="checkbox" id="alternative">

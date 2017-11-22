@@ -1,4 +1,23 @@
-// Start off by initializing a new context.
+// audioengine.js
+// Simple utility wrapper around some Web Audio API features to be able to
+// quickly build applications which play sound using the Web Audio API.
+// To use this functions include audioengine.js and use the AudioManager "am" 
+// variable like:
+//    am.playSoundFromURL("http://sound.org/example.ogg")
+//    am.setMainVolume(0.5)
+// If playing a sound which was already played in the future, the AudioManager
+// object will keep the buffer and reuse the data.
+
+var audioengine_verbose = false;
+function log(message) {
+  if (audioengine_verbose){
+    console.log(message)
+  }
+}
+
+
+// "Private" interface (don't use these methods directly outside audioengine.js)
+
 function startAudioContext(){
     context = new (window.AudioContext || window.webkitAudioContext)();
     if (!context.createGain)
@@ -7,13 +26,7 @@ function startAudioContext(){
     context.gainNode.connect(context.destination);
 }
 
-
-function setVolume(value){
-  context.gainNode.gain.value = value;
-}
-
-
-function playSound(buffer, time) {
+function playBuffer(buffer, time) {
   const source = context.createBufferSource();
   source.buffer = buffer;
   source.connect(context.gainNode);
@@ -64,7 +77,7 @@ BufferLoader.prototype.loadBuffer = function(url, index) {
       request.response,
       function(buffer) {
         if (!buffer) {
-          console.log('error decoding file data: ' + url);
+          log('Error decoding file data: ' + url);
           return;
         }
         loader.bufferList[index] = buffer;
@@ -72,13 +85,13 @@ BufferLoader.prototype.loadBuffer = function(url, index) {
           loader.onload(loader.bufferList);
       },
       function(error) {
-        console.error('decodeAudioData error', error);
+        log('DecodeAudioData error: ' + error);
       }
     );
   }
 
   request.onerror = function() {
-    console.log('BufferLoader: XHR error');
+    log('BufferLoader: XHR error');
   }
 
   request.send();
@@ -89,32 +102,57 @@ BufferLoader.prototype.load = function() {
   this.loadBuffer(this.urlList[i], i);
 };
 
-aux_player = new Audio()
-function play_sound_from_url(url){
-    aux_player.src = url;
-    aux_player.autoplay = true;
-}
 
-
+// Public interface (AudioManager object)
 
 var AudioManager = function() {};
 
-AudioManager.prototype.playSoundByName = function(name, time) {
-  if (time == undefined){
-    time = 0;
-  }
+AudioManager.prototype.loadSound = function(url, onLoadedCallback) {
+  log('Loading: ' + url);
+  var name = url;  // Use URL to identify the sound in pool
+  var soundMap = {}
+  soundMap[name] = url
+  loadSounds(this, soundMap, function(){
+    onLoadedCallback(name);
+  });
+}
+
+AudioManager.prototype.playBufferByName = function(name, time) {
+  log('Playing: ' + name);
+  if (time === undefined){ time = 0; }
   if (name in this){
-    playSound(this[name], time);
+    playBuffer(this[name], time);
   } else {
-    console.log("ERROR: " + name + " not available!")
+    log('Error: "' + name + '" buffer not loaded!')
   }
 }
 
-AudioManager.prototype.loadSound = function(name, url, callback) {
-  var name = name.toString();
-  var soundMap = {}
-    soundMap[name] = url
-    loadSounds(this, soundMap, function(){
-      callback(name);
-  });
+AudioManager.prototype.playSoundFromURL = function(url, time) {
+  if (time === undefined){ time = 0; }
+  if (url in this){ // If sound is already loaded, just play it
+    AudioManager.prototype.playBufferByName(url, time);
+  } else { // If sound has not been loaded, load it and play afterwards
+    AudioManager.prototype.loadSound(url, function(){
+      AudioManager.prototype.playBufferByName(url, time);
+    })  
+  }
 }
+
+AudioManager.prototype.setMainVolume = function(value) {
+  // value should be in range [0, 1]
+  if (value > 1.0){
+    value = 1.0;
+  } else if (value < 0){
+    value = 0.0;
+  }
+  context.gainNode.gain.value = value;
+}
+
+// Initialize things
+var am = undefined;
+function init(){
+  startAudioContext();
+  am = new AudioManager();
+}
+
+init();

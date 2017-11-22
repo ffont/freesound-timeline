@@ -8,25 +8,19 @@
 	</head>
 	<body>
 		<script type="text/javascript">
-			var audio_manager = new AudioManager();
 			var PLAYERS = [];
 
 			window.onload = function(){
 				freesound.setToken("d31c795be3f70f7f04b21aeca4c5b48a599db6e9");
-				startAudioContext();
 			};			
 			
-			function myPlaySound(name,url){
-				console.log("Creating sound: " + name)
-
-				
+			function myPlaySound(name,url){				
 				//PLAYERS.push(a);
 
 				// TODO: would be nice to pan randomly
 				document.getElementById("respSearch").innerHTML = "Playing: " + name;
-				audio_manager.loadSound(name, url, function(name){
-					audio_manager.playSoundByName(name);
-				});
+				am.playSoundFromURL(url);
+				
 				// TODO: play on loop and display text
 				// TODO: implement stop all sounds
 

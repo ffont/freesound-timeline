@@ -4,29 +4,34 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 		<title>fressound timeline</title>
 		<script type="text/javascript" src="freesound.js"></script>
+		<script src="audioengine.js"></script>
 	</head>
 	<body>
 		<script type="text/javascript">
+
 			window.onload = function(){
 				freesound.setToken("d31c795be3f70f7f04b21aeca4c5b48a599db6e9");
 			};
 
-			var PLAYERS = [];
-			
-			function playSound(name,url){
-				console.log("Creating sound: " + name)
+			function randomBetween(min, max) {
+			    if (min < 0) {
+			        return min + Math.random() * (Math.abs(min)+max);
+			    }else {
+			        return min + Math.random() * max;
+			    }
+			}
 
-				var a = new Audio(url);
-				PLAYERS.push(a);
+			function playSound(name,url){				
 
-				// TODO: would be nice to pan randomly
 				document.getElementById("respSearch").innerHTML = "Playing: " + name;
-	    		a.play();
-	    		a.onended = function() {
-	    			// Loop and display
-	    			document.getElementById("respSearch").innerHTML = "Playing: " + name;
-	    			a.play();
-				};
+				am.playSoundFromURL(url, 0, {
+					panHRTF: {x:randomBetween(-1.0, 1.0), y:randomBetween(-2.0, 2.0), z:randomBetween(-2.0, 2.0) },
+					onended: function(event){
+						playSound(name, url);  // On end, play again the sound
+						// NOTE: we don't use Web Audio API loop prop here as it does not trigger onended event
+					}
+				});
+				
 				if (document.getElementById("panic2").offsetParent !== null){
 					document.getElementById("panic2").style.display = 'none';
 					document.getElementById("panic1").style.display = 'block';
@@ -125,8 +130,7 @@
 			}
 			
 			function stopAllSounds(){			
-	  			for(i=0; i<PLAYERS.length; i++) PLAYERS[i].pause();
-	  			PLAYERS = [];
+	  			am.stopAllBuffers(disableOnEnded=true);
 				document.getElementById("panic1").style.display = 'none';
 				document.getElementById("panic2").style.display = 'block';
 				document.getElementById("respSearch").innerHTML = "";

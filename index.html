@@ -28,6 +28,7 @@
 				cursor:pointer;
 				font-size: 12px;
 			}
+			.slider_label {vertical-align: top;}
 			button:hover {background-color: #f76576; }
 			.black_button {background-color: #333; }
 			.black_button:hover {background-color: #888; }
@@ -80,6 +81,7 @@
 					if (document.getElementById("panic2").offsetParent !== null){
 						document.getElementById("panic2").style.display = 'none';
 						document.getElementById("panic1").style.display = 'block';
+						document.getElementById("volumeDisplay").style.display = 'block';
 					}
 
 				} else {
@@ -105,6 +107,7 @@
 				// Update UI
 				document.getElementById("panic1").style.display = 'none';
 				document.getElementById("panic2").style.display = 'block';
+				document.getElementById("volumeDisplay").style.display = 'none';
 				document.getElementById("respSearch").innerHTML = "";
 			}
 
@@ -226,6 +229,11 @@
 				soundscape_compleixty = value;
 			}
 
+			function setVolume(){
+				var value = document.getElementById('volume').value;
+				am.setMainVolume(value);
+			}
+
 
 			// Search and interaction with Freesound
 
@@ -291,7 +299,8 @@
 				<br>
 				enter year (2005-now): <input type="text" id="year" value="2011" size=4 maxlength=4>
 				<br>
-				density: <input id="complexity" type="range" min=0.05 max=1.0 step='.05' value='1.0' onchange="setComplexity()">
+				<span class="slider_label">density:</span> <input id="complexity" type="range" min=0.05 max=1.0 step='.05' value=1.0 oninput="setComplexity()" onchange="setComplexity()">
+				
 			</p>
 			
 			<p>
@@ -303,7 +312,10 @@
 			</p>
 			
 			
-			<br><div id="respSearch">please <b>use headphones</b> for the full experience</div>
+			<br><div> 
+				<span id="respSearch">please <b>use headphones</b> for the full experience</span>
+				<div id="volumeDisplay" style="display:none;"><span class="slider_label">volume:</span> <input id="volume" type="range" min=0.0 max=1.0 step='.05' value=1.0 oninput="setVolume()" onchange="setVolume()"></div>
+			</div>
 			<br>
 				<div id="panic1" style="display:none"><button id="stopAllSounds" class="black_button" onclick="stopAllSounds()">panic!</button></div>
 				<div id="panic2">no need for panic button... yet!</div>

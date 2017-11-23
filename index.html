@@ -5,10 +5,31 @@
 		<title>fressound timeline</title>
 		<script type="text/javascript" src="freesound.js"></script>
 		<script src="audioengine.js"></script>
+		<link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
 		<style>
+			body {font-family: 'Open Sans', sans-serif;}
+			h1 {font-family: Helvetiva, Arial;}
 			a {color: #F31C36; text-decoration: none;}
 			a:visited {color: #F31C36;}
 			a:hover {color: #F31C36; text-decoration: underline;}
+			input { padding: 5px; border-radius: 4px; border: 1px #ddd solid; }
+			button { 
+				height: 24px;
+				border-radius: 12px; 
+				padding-left: 10px; 
+				padding-right: 10px; 
+				border: 0px; 
+				background-color: #F31C36; 
+				color: white; 
+				margin: 0px;
+				margin-bottom: 3px;
+				cursor:pointer;
+			}
+			button:hover {background-color: #f76576; }
+			.black_button {background-color: #000; }
+			.black_button:hover {background-color: #555; }
+			.red_text {color:#F31C36; }
+			.gray_text {color:#888; }
 		</style>
 	</head>
 	<body>
@@ -218,7 +239,7 @@
 					document.getElementById("respSearch").innerHTML = "";
 					document.getElementById("respSearch").innerHTML = "Loading sounds... will begin playing at any moment...";
 
-					document.getElementById('attributionList').innerHTML = 'Sounds used: <br><br>';
+					document.getElementById('attributionList').innerHTML = '<span class="gray_text">Sounds used:</span> <br><br>';
 					for (i =0;i<sounds.length;i++){  
 	                    var snd = sounds[i];
 	                    var label = '<a href="' + snd.url + '" target="_blank">' + snd.name + '</a> by <b>' + snd.username + '</b>';
@@ -265,35 +286,36 @@
 
 		</script>
 		<br>
-		<h1 id="header" style="font-family:Helvetica, Arial; text-align: center">free<span style="color:#F31C36">sound</span> timeline</h1>
-		<div style="text-align:center;font-family:Helvetica, Arial;font-size:12px">
-			enter month (1-12): <input type="text" id="month" value="8" size=2 maxlength=2>
+		<h1 style="text-align: center">free<span class="red_text">sound</span> timeline</h1>
+		<div style="text-align:center;font-size:12px">
+			<p>
+				enter month (1-12): <input type="text" id="month" value="8" size=2 maxlength=2>
+				<br>
+				enter year (2005-now): <input type="text" id="year" value="2011" size=4 maxlength=4>
+				<br>
+				complexity: <input id="complexity" type="range" min=0.05 max=1.0 step='.05' value='1.0' onchange="setComplexity()">
+			</p>
+			
+			<p>
+				<button id="search" onclick="play()">play!</button>
+				<input type="checkbox" id="alternative">
+				<br>
+				<button onclick="previous()"><<</button>
+				<button onclick="next()">>></button>
+			</p>
+			
+			
+			<br><div id="respSearch">please <b>use headphones</b> for the full experience</div>
 			<br>
-			enter year (2005-now): <input type="text" id="year" value="2011" size=4 maxlength=4>
+				<div id="panic1" style="display:none"><button id="stopAllSounds" class="black_button" onclick="stopAllSounds()">panic!</button></div>
+				<div id="panic2">no need for panic button... yet!</div>
 			<br>
-			complexity: <input id="complexity" type="range" min=0.05 max=1.0 step='.05' value='1.0' onchange="setComplexity()">
-			<br>
-			<input type="button" id="search" value="play!" onclick="play()">
-			<input type="checkbox" id="alternative">
-			<br>
-			<input type="button" id="search" value="<<" onclick="previous()"><input type="button" id="search" value=">>" onclick="next()">
-			<br><br>
-			<div id="respSearch">please <b>use headphones</b> for the full experience</div>
-			<br>
-			<div id="panic1" style="display:none">
-				<input type="button" id="stopAllSounds" value="panic!" onclick="stopAllSounds()">
-			</div>
-			<div id="panic2">
-				no need for panic button... yet!
-			</div>
-			<br>
-			<div id="attributionList">
-			</div>
+			<div id="attributionList"></div>
 			<br>
 			<br>
-			<div style="max-width:800px;display:inline-block;color:gray;">	
+			<div style="max-width:800px;display:inline-block;" class="gray_text">	
 				This is a very simple and stupid hack that gets the most popular sounds in <a href="https://freesound.org" target="_blank">Freesound</a> for a given
-				year and month and plays them all at once (in loop). Set the checkbox on for an alternative "measure" of popularity. This hack was originally implemented in 2011 when I was starting to learn about web technologies. It has been recently updated to use Freesound APIv2 and Web Audio API (with random HRTF panning for each sound!), but besides that the bad code has been left intact. Want to contribute? visit the <a href="http://github.com/ffont/freesound-timeline" target="_blank">code repository</a>.
+				year and month and plays them all at once (in loop). Set the checkbox on for an alternative "measure" of popularity. This hack was originally implemented in 2011 when I was starting to learn about web technologies. It has been recently updated to use Freesound APIv2, the Web Audio API (including random HRTF panning for each sound!) and some other small improvements. Want to contribute? visit the <a href="http://github.com/ffont/freesound-timeline" target="_blank">code repository</a>.
 			</div>
 		</div>
 	</body>

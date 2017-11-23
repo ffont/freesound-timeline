@@ -17,6 +17,7 @@
 
 			var soundscape_compleixty = 1.0;
 			var soundscape_complexity_interval = 3000;
+			var query_page_size = 15;
 			var play_timers = [];
 			var am = undefined; // Audio manager
 
@@ -246,7 +247,7 @@
 				var fields = "id,name,previews,username,license,url"
 
 				// Run query				
-				freesound.textSearch(q, {page:p, filter:f, sort:s, fields:fields},
+				freesound.textSearch(q, {page:p, filter:f, sort:s, fields:fields, page_size:query_page_size},
 		            function(data){
 		            	// Process successful response
 		            	processResponse(data);

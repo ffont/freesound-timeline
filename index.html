@@ -46,6 +46,12 @@
 			var query_page_size = 15;
 			var play_timers = [];
 			var am = undefined; // Audio manager
+			var sounds_current_month = [];
+			var sounds_next_month = [];
+			var evolutionTimer = undefined;
+			var evolutionTimeInterval = 1000;
+			var evolutionCurrentStep = 0;
+			var evolutionResolution = 16; // Number of steps per month
 
 			window.onload = function(){
 				freesound.setToken("d31c795be3f70f7f04b21aeca4c5b48a599db6e9");
@@ -263,23 +269,30 @@
 
 			function search(){
 
-				// Prepare search params
-				var month = document.getElementById('month').value;
-				var year = document.getElementById('year').value;
+				// Prepare commons search params
 				var q = "";
 				var p = 1;
-				var f = "created:[" + year + "-" + month + "-1T00:00:00Z TO " + get_next_year(year,month) + "-" + get_next_month(month) + "-01T00:00:00Z] duration:[0.0 TO 60]";
-				if (!document.getElementById('alternative').checked){
-					var s = "rating_desc";
-				}else{
-					var s = "downloads_desc";
-				}
 				var fields = "id,name,previews,username,license,url"
+				var s = "rating_desc"; // Default is by ratings
+				if (document.getElementById('alternative').checked){ s = "downloads_desc"; }
 
-				// Run query				
-				freesound.textSearch(q, {page:p, filter:f, sort:s, fields:fields, page_size:query_page_size},
+				// Prepare filter for current month query
+				var month = document.getElementById('month').value;
+				var year = document.getElementById('year').value;
+				var next_month = get_next_month(month);
+				var next_year = get_next_year(year, month);
+				var f_current = "created:[" + year + "-" + month + "-1T00:00:00Z TO " + next_year + "-" + next_month + "-01T00:00:00Z] duration:[0.0 TO 60]";
+
+				// Prepare filter for next month query
+				var next_next_year = get_next_year(next_year, next_month)
+				var next_next_month = get_next_month(next_month);
+				var f_next = "created:[" + next_year + "-" + next_month + "-1T00:00:00Z TO " + next_next_year + "-" + next_next_month + "-01T00:00:00Z] duration:[0.0 TO 60]";
+				
+				// Run query to get sounds from current month				
+				freesound.textSearch(q, {page:p, filter:f_current, sort:s, fields:fields, page_size:query_page_size},
 		            function(data){
 		            	// Process successful response
+		            	sounds_current_month = data.results;
 		            	processResponse(data);
 		                
 		            },function(){ 
@@ -287,8 +300,61 @@
 		            	document.getElementById("respSearch").innerHTML = "Error while searching..."; 
 		            }
 		        );
+
+		        // Run query to get sounds from next month				
+				freesound.textSearch(q, {page:p, filter:f_next, sort:s, fields:fields, page_size:query_page_size},
+		            function(data){
+		            	// Process successful response
+		            	sounds_next_month = data.results;
+		            	// processResponse(data);
+		            },function(){ 
+		            	// Process error response
+		            	document.getElementById("respSearch").innerHTML = "Error while searching..."; 
+		            }
+		        );
+
 				document.getElementById("respSearch").innerHTML = "";
 				document.getElementById("respSearch").innerHTML = "Waiting for results...";
+			}
+
+			function step() {
+
+				var month = document.getElementById('month').value;
+				var year = document.getElementById('year').value;
+				console.log('Processing step ' + evolutionCurrentStep + ' of ' + month + '/' + year);
+
+
+				if (evolutionCurrentStep === (evolutionResolution - 1)){
+					// fully advance 1 month
+					// search sounds for new months
+					var next_month = get_next_month(month);
+					var next_year = get_next_year(year, month);
+					document.getElementById('month').value = next_month;
+					document.getElementById('year').value = next_year;
+					play();
+					setHash();
+					evolutionCurrentStep = 0; // Restart step counter
+				} else {
+					// Check in which position we are with respect from one month to the next
+					// Decide whether to remove/add sounds to the pool
+					
+					evolutionCurrentStep += 1; // Advance step
+				}
+				
+				evolutionTimer = setTimeout(function(){
+					step();
+				}, evolutionTimeInterval);
+			}
+
+			function startEvolution(){
+				evolutionTimer = setTimeout(function(){
+					step();
+				}, evolutionTimeInterval);
+			}
+
+			function stopEvolution(){
+				clearTimeout(evolutionTimer);
+				evolutionTimer = undefined;
 			}
 
 		</script>

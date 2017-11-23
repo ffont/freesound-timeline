@@ -65,8 +65,6 @@
 
 			function playSound(name,url){
 
-				lazyInitAudioManager();
-				
 				// Only play sound if a random number is above a specific probability, otherwise try
 				// again after some time.
 				if (Math.random() >= (1.0 - soundscape_compleixty)) {
@@ -91,12 +89,10 @@
 				}	
 			}
 
-			function stopAllSounds(){	
+			function stopAllSounds(){
 
 				// Stop all playing audio buffers (if am was ever initialized only)
-				if (am !== undefined){
-					am.stopAllBuffers(disableOnEnded=true);	
-				}
+				am.stopAllBuffers(disableOnEnded=true);	
 				
 				// Clear all existing timeouts
 				for (var i =0;i<play_timers.length;i++){  
@@ -201,6 +197,7 @@
 			// Button interactions
 
 			function play(){
+				lazyInitAudioManager(); // Init audio context here in response to user action
 				stopAllSounds();
 				document.getElementById('attributionList').innerHTML = '';
 				setHash();
@@ -233,7 +230,6 @@
 
 			function processResponse(data) {
 				var sounds = data.results;
-            	console.log("Resuls received")
 				if (sounds.length == 0){
 					document.getElementById("respSearch").innerHTML = "";
 					document.getElementById("respSearch").innerHTML = "No results...";
@@ -281,7 +277,6 @@
 		            	document.getElementById("respSearch").innerHTML = "Error while searching..."; 
 		            }
 		        );
-				console.log("Waiting for results...")
 				document.getElementById("respSearch").innerHTML = "";
 				document.getElementById("respSearch").innerHTML = "Waiting for results...";
 			}

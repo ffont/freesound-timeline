@@ -188,6 +188,7 @@ AudioManager.prototype.stopAllBuffers = function(disableOnEnded) {
 
 // Initialize things
 function initAudioManager(){
+  log('Initializing audio context and audio manager')
   startAudioContext();
   return new AudioManager();
 }

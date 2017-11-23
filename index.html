@@ -39,7 +39,8 @@
 					document.getElementById("alternative").checked = true;
 				}
 				if (complexity) {
-					document.getElementById("complexity").value = complexity;	
+					soundscape_compleixty = complexity;
+					document.getElementById("complexity").value = soundscape_compleixty;	
 				}
 			}
 
@@ -206,12 +207,12 @@
 			<br>
 			complexity: <input id="complexity" type="range" min=0.05 max=1.0 step='.05' value='1.0' onchange="setComplexity()">
 			<br>
-			<input type="button" id="search" value="go!" onclick="search()">
+			<input type="button" id="search" value="play!" onclick="search()">
 			<input type="checkbox" id="alternative">
 			<br>
 			<input type="button" id="search" value="<<" onclick="previous()"><input type="button" id="search" value=">>" onclick="next()">
 			<br><br>
-			<div id="respSearch"></div>
+			<div id="respSearch">please <b>use headphones</b> for the full experience</div>
 			<br>
 			<br>
 			<div id="panic1" style="display:none">

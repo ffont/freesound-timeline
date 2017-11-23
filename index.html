@@ -290,7 +290,7 @@
 				<br>
 				enter year (2005-now): <input type="text" id="year" value="2011" size=4 maxlength=4>
 				<br>
-				complexity: <input id="complexity" type="range" min=0.05 max=1.0 step='.05' value='1.0' onchange="setComplexity()">
+				density: <input id="complexity" type="range" min=0.05 max=1.0 step='.05' value='1.0' onchange="setComplexity()">
 			</p>
 			
 			<p>
@@ -312,7 +312,9 @@
 			<br>
 			<div style="max-width:800px;display:inline-block;" class="gray_text">	
 				This is a very simple and stupid hack that gets the most popular sounds in <a href="https://freesound.org" target="_blank">Freesound</a> for a given
-				year and month and plays them all at once (in loop). Set the checkbox on for an alternative "measure" of popularity. This hack was originally implemented in 2011 when I was starting to learn about web technologies. It has been recently updated to use Freesound APIv2, the Web Audio API (including random HRTF panning for each sound!) and some other small improvements. Want to contribute? visit the <a href="http://github.com/ffont/freesound-timeline" target="_blank">code repository</a>.
+				year and month and plays them all at once (in loop). Set the checkbox next to the play button to ON for an alternative measure of popularity. Use the density slider to adjust the complexity of the generated soundscape. 
+
+				<br><br>This hack was originally implemented in 2011 when I was starting to learn about web technologies. It has been recently updated to use Freesound APIv2, the Web Audio API (including random HRTF panning for each sound!) and to include some other nice improvements. Want to contribute? visit the <a href="http://github.com/ffont/freesound-timeline" target="_blank">code repository</a>.
 			</div>
 		</div>
 	</body>

@@ -13,9 +13,81 @@
 	<body>
 		<script type="text/javascript">
 
+			// Global variables and init
+
 			var soundscape_compleixty = 1.0;
 			var soundscape_complexity_interval = 3000;
 			var play_timers = [];
+			var am = undefined; // Audio manager
+
+			window.onload = function(){
+				freesound.setToken("d31c795be3f70f7f04b21aeca4c5b48a599db6e9");
+				parseHashAndSetParams();
+			};
+
+
+			// Audio stuff
+
+			function lazyInitAudioManager(){
+				// Lazily initialize audio manager
+				// We only init audio manager when we really need it (when a sound is to be played)
+				// In this way we expect to avoid restrictions in browsers where audio
+				// is only played when users have made some interactions
+				if (am === undefined) {
+					am = initAudioManager();
+				}
+			}
+
+			function playSound(name,url){
+
+				lazyInitAudioManager();
+				
+				// Only play sound if a random number is above a specific probability, otherwise try
+				// again after some time.
+				if (Math.random() >= (1.0 - soundscape_compleixty)) {
+					document.getElementById("respSearch").innerHTML = "Playing: " + name;
+					am.playSoundFromURL(url, 0, {
+						panHRTF: {x:randomBetween(-1.0, 1.0), y:randomBetween(-2.0, 2.0), z:randomBetween(-2.0, 2.0) },
+						onended: function(event){
+							playSound(name, url);  // On end, play again the sound
+							// NOTE: we don't use Web Audio API loop prop here as it does not trigger onended event
+						}
+					});
+					if (document.getElementById("panic2").offsetParent !== null){
+						document.getElementById("panic2").style.display = 'none';
+						document.getElementById("panic1").style.display = 'block';
+					}
+
+				} else {
+					var play_timer = setTimeout(function(){
+						playSound(name, url);
+					}, soundscape_complexity_interval);
+					play_timers.push(play_timer);
+				}	
+			}
+
+			function stopAllSounds(){	
+
+				// Stop all playing audio buffers (if am was ever initialized only)
+				if (am !== undefined){
+					am.stopAllBuffers(disableOnEnded=true);	
+				}
+				
+				// Clear all existing timeouts
+				for (var i =0;i<play_timers.length;i++){  
+					var timer = play_timers[i];
+					clearTimeout(timer);
+				}
+				play_timers = [];
+
+				// Update UI
+				document.getElementById("panic1").style.display = 'none';
+				document.getElementById("panic2").style.display = 'block';
+				document.getElementById("respSearch").innerHTML = "";
+			}
+
+
+			// Util functions
 
 			function randomBetween(min, max) {
 				// from https://stackoverflow.com/questions/4959975/generate-random-number-between-two-numbers-in-javascript
@@ -26,7 +98,7 @@
 			    }
 			}
 
-			function parseHash(){
+			function parseHashAndSetParams(){
 				// Set month, year and popularity measure from hash (if present)
 				var hash = window.location.hash;
 				hash = hash.slice(1,hash.length).split(',');
@@ -58,54 +130,6 @@
 				parent.location.hash = hash;
 			}
 
-			window.onload = function(){
-				freesound.setToken("d31c795be3f70f7f04b21aeca4c5b48a599db6e9");
-				parseHash();
-			};
-
-			function playSound(name,url){
-
-				// Only play sound if a random number is above a specific probability, otherwise try
-				// again after some time.
-				if (Math.random() >= (1.0 - soundscape_compleixty)) {
-					document.getElementById("respSearch").innerHTML = "Playing: " + name;
-					am.playSoundFromURL(url, 0, {
-						panHRTF: {x:randomBetween(-1.0, 1.0), y:randomBetween(-2.0, 2.0), z:randomBetween(-2.0, 2.0) },
-						onended: function(event){
-							playSound(name, url);  // On end, play again the sound
-							// NOTE: we don't use Web Audio API loop prop here as it does not trigger onended event
-						}
-					});
-					if (document.getElementById("panic2").offsetParent !== null){
-						document.getElementById("panic2").style.display = 'none';
-						document.getElementById("panic1").style.display = 'block';
-					}
-
-				} else {
-					var play_timer = setTimeout(function(){
-						playSound(name, url);
-					}, soundscape_complexity_interval);
-					play_timers.push(play_timer);
-				}	
-			}
-
-			function stopAllSounds(){		
-				// Stop all playing audio buffers	
-	  			am.stopAllBuffers(disableOnEnded=true);
-				
-				// Clear all existing timeouts
-				for (var i =0;i<play_timers.length;i++){  
-					var timer = play_timers[i];
-					clearTimeout(timer);
-				}
-				play_timers = [];
-
-				// Update UI
-				document.getElementById("panic1").style.display = 'none';
-				document.getElementById("panic2").style.display = 'block';
-				document.getElementById("respSearch").innerHTML = "";
-			}
-
 			function getLicenseName(license_url){
 				return {
 					'http://creativecommons.org/licenses/by/3.0/': 'CC-BY',
@@ -115,77 +139,7 @@
 				}[license_url]
 
 			}
-			
-			function search(){
 
-				stopAllSounds();
-				document.getElementById('attributionList').innerHTML = '';
-
-				var month = document.getElementById('month').value;
-				var year = document.getElementById('year').value;
-
-				var q = "";
-				var p = 1;
-				var f = "created:[" + year + "-" + month + "-1T00:00:00Z TO " + get_next_year(year,month) + "-" + get_next_month(month) + "-01T00:00:00Z] duration:[0.0 TO 60]";
-				if (!document.getElementById('alternative').checked){
-					var s = "rating_desc";
-				}else{
-					var s = "downloads_desc";
-				}
-
-				setHash();
-				
-				var fields = "id,name,previews,username,license,url"
-				freesound.textSearch(q, {page:p, filter:f, sort:s, fields:fields},
-		            function(data){
-		            	var sounds = data.results;
-		            	console.log("Resuls received")
-						if (sounds.length == 0){
-							document.getElementById("respSearch").innerHTML = "";
-							document.getElementById("respSearch").innerHTML = "No results...";
-						}else{
-							document.getElementById("respSearch").innerHTML = "";
-							document.getElementById("respSearch").innerHTML = "Loading sounds... will begin playing at any moment...";
-
-							document.getElementById('attributionList').innerHTML = 'Sounds used: <br><br>';
-							for (i =0;i<sounds.length;i++){  
-			                    var snd = sounds[i];
-			                    var label = '<a href="' + snd.url + '" target="_blank">' + snd.name + '</a> by <b>' + snd.username + '</b>';
-			                    
-			                    playSound(label, snd.previews['preview-hq-mp3'])	 // ogg seems to fail on safari...
-
-			                    // Add attribution
-			                    document.getElementById('attributionList').innerHTML += 
-			                    	label + ' (<a href="' + snd.license + '" target="_blank">' + getLicenseName(snd.license) + '</a>)<br>'
-			                }
-						}
-		                
-		            },function(){ 
-		            	document.getElementById("respSearch").innerHTML = "Error while searching..."; 
-		            }
-		        );
-				console.log("Waiting for results...")
-				document.getElementById("respSearch").innerHTML = "";
-				document.getElementById("respSearch").innerHTML = "Waiting for results...";
-			}
-			
-			function next(){
-				var month = document.getElementById('month').value;
-				var year = document.getElementById('year').value;
-				document.getElementById('month').value = get_next_month(month)
-				document.getElementById('year').value = get_next_year(year,month)
-				search()
-			}
-			
-			function previous(){
-				var month = document.getElementById('month').value;
-				var year = document.getElementById('year').value;
-				document.getElementById('month').value = get_previous_month(month)
-				document.getElementById('year').value = get_previous_year(year,month)
-				search()
-			}
-			
-			
 			function get_next_month(month){
 				if (parseInt(month,10) >= 12){
 					return "1"
@@ -218,9 +172,93 @@
 				}
 			}
 
+
+			// Button interactions
+
+			function play(){
+				stopAllSounds();
+				document.getElementById('attributionList').innerHTML = '';
+				setHash();
+				search();
+			}
+
+			function next(){
+				var month = document.getElementById('month').value;
+				var year = document.getElementById('year').value;
+				document.getElementById('month').value = get_next_month(month);
+				document.getElementById('year').value = get_next_year(year,month);
+				play();
+			}
+			
+			function previous(){
+				var month = document.getElementById('month').value;
+				var year = document.getElementById('year').value;
+				document.getElementById('month').value = get_previous_month(month);
+				document.getElementById('year').value = get_previous_year(year,month);
+				play();
+			}
+
 			function setComplexity(){
 				var value = document.getElementById('complexity').value;
 				soundscape_compleixty = value;
+			}
+
+
+			// Search and interaction with Freesound
+
+			function processResponse(data) {
+				var sounds = data.results;
+            	console.log("Resuls received")
+				if (sounds.length == 0){
+					document.getElementById("respSearch").innerHTML = "";
+					document.getElementById("respSearch").innerHTML = "No results...";
+				}else{
+					document.getElementById("respSearch").innerHTML = "";
+					document.getElementById("respSearch").innerHTML = "Loading sounds... will begin playing at any moment...";
+
+					document.getElementById('attributionList').innerHTML = 'Sounds used: <br><br>';
+					for (i =0;i<sounds.length;i++){  
+	                    var snd = sounds[i];
+	                    var label = '<a href="' + snd.url + '" target="_blank">' + snd.name + '</a> by <b>' + snd.username + '</b>';
+	                    
+	                    playSound(label, snd.previews['preview-hq-mp3'])	 // ogg seems to fail on safari...
+
+	                    // Add attribution
+	                    document.getElementById('attributionList').innerHTML += 
+	                    	label + ' (<a href="' + snd.license + '" target="_blank">' + getLicenseName(snd.license) + '</a>)<br>'
+	                }
+				}
+			}
+
+			function search(){
+
+				// Prepare search params
+				var month = document.getElementById('month').value;
+				var year = document.getElementById('year').value;
+				var q = "";
+				var p = 1;
+				var f = "created:[" + year + "-" + month + "-1T00:00:00Z TO " + get_next_year(year,month) + "-" + get_next_month(month) + "-01T00:00:00Z] duration:[0.0 TO 60]";
+				if (!document.getElementById('alternative').checked){
+					var s = "rating_desc";
+				}else{
+					var s = "downloads_desc";
+				}
+				var fields = "id,name,previews,username,license,url"
+
+				// Run query				
+				freesound.textSearch(q, {page:p, filter:f, sort:s, fields:fields},
+		            function(data){
+		            	// Process successful response
+		            	processResponse(data);
+		                
+		            },function(){ 
+		            	// Process error response
+		            	document.getElementById("respSearch").innerHTML = "Error while searching..."; 
+		            }
+		        );
+				console.log("Waiting for results...")
+				document.getElementById("respSearch").innerHTML = "";
+				document.getElementById("respSearch").innerHTML = "Waiting for results...";
 			}
 
 		</script>
@@ -233,7 +271,7 @@
 			<br>
 			complexity: <input id="complexity" type="range" min=0.05 max=1.0 step='.05' value='1.0' onchange="setComplexity()">
 			<br>
-			<input type="button" id="search" value="play!" onclick="search()">
+			<input type="button" id="search" value="play!" onclick="play()">
 			<input type="checkbox" id="alternative">
 			<br>
 			<input type="button" id="search" value="<<" onclick="previous()"><input type="button" id="search" value=">>" onclick="next()">

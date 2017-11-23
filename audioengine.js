@@ -3,12 +3,13 @@
 // quickly build applications which play sound using the Web Audio API.
 // To use this functions include audioengine.js and use the AudioManager "am" 
 // variable like:
+//    am = initAudioManager();
 //    am.playSoundFromURL("http://sound.org/example.ogg")
 //    am.setMainVolume(0.5)
 // If playing a sound which was already played in the future, the AudioManager
 // object will keep the buffer and reuse the data.
 
-var audioengine_verbose = true;
+var audioengine_verbose = false;
 function log(message) {
   if (audioengine_verbose){
     console.log(message)
@@ -186,10 +187,7 @@ AudioManager.prototype.stopAllBuffers = function(disableOnEnded) {
 }
 
 // Initialize things
-var am = undefined;
-function init(){
+function initAudioManager(){
   startAudioContext();
-  am = new AudioManager();
+  return new AudioManager();
 }
-
-init();

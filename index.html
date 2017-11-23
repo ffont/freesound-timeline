@@ -5,12 +5,17 @@
 		<title>fressound timeline</title>
 		<script type="text/javascript" src="freesound.js"></script>
 		<script src="audioengine.js"></script>
+		<style>
+			a {color: #F31C36; text-decoration: none;}
+			a:visited {color: #F31C36;}
+		</style>
 	</head>
 	<body>
 		<script type="text/javascript">
 
 			var soundscape_compleixty = 1.0;
 			var soundscape_complexity_interval = 3000;
+			var play_timers = [];
 
 			function randomBetween(min, max) {
 				// from https://stackoverflow.com/questions/4959975/generate-random-number-between-two-numbers-in-javascript
@@ -77,17 +82,38 @@
 					}
 
 				} else {
-					setTimeout(function(){
+					var play_timer = setTimeout(function(){
 						playSound(name, url);
 					}, soundscape_complexity_interval);
+					play_timers.push(play_timer);
 				}	
 			}
 
-			function stopAllSounds(){			
+			function stopAllSounds(){		
+				// Stop all playing audio buffers	
 	  			am.stopAllBuffers(disableOnEnded=true);
+				
+				// Clear all existing timeouts
+				for (var i =0;i<play_timers.length;i++){  
+					var timer = play_timers[i];
+					clearTimeout(timer);
+				}
+				play_timers = [];
+
+				// Update UI
 				document.getElementById("panic1").style.display = 'none';
 				document.getElementById("panic2").style.display = 'block';
 				document.getElementById("respSearch").innerHTML = "";
+			}
+
+			function getLicenseName(license_url){
+				return {
+					'http://creativecommons.org/licenses/by/3.0/': 'CC-BY',
+					'http://creativecommons.org/publicdomain/zero/1.0/': 'CC0',
+					'http://creativecommons.org/licenses/by-nc/3.0/': 'CC-BY-NC',
+					'http://creativecommons.org/licenses/sampling+/1.0/': 'CC-S+',
+				}[license_url]
+
 			}
 			
 			function search(){
@@ -130,7 +156,7 @@
 
 			                    // Add attribution
 			                    document.getElementById('attributionList').innerHTML += 
-			                    	label + ' (<a href="' + snd.license + '" target="_blank">' + snd.license + '</a>)<br>'
+			                    	label + ' (<a href="' + snd.license + '" target="_blank">' + getLicenseName(snd.license) + '</a>)<br>'
 			                }
 						}
 		                
@@ -214,7 +240,6 @@
 			<br><br>
 			<div id="respSearch">please <b>use headphones</b> for the full experience</div>
 			<br>
-			<br>
 			<div id="panic1" style="display:none">
 				<input type="button" id="stopAllSounds" value="panic!" onclick="stopAllSounds()">
 			</div>
@@ -222,13 +247,12 @@
 				no need for panic button... yet!
 			</div>
 			<br>
-			<br>
 			<div id="attributionList">
 			</div>
 			<br>
 			<br>
 			<div style="max-width:800px;display:inline-block;color:gray;">	
-				This is a very simple and stupid hack that gets the most popular sounds in <a href="freesound.org" target="_blank">Freesound</a> for a given
+				This is a very simple and stupid hack that gets the most popular sounds in <a href="https://freesound.org" target="_blank">Freesound</a> for a given
 				year and month and plays them all at once (in loop). Set the checkbox on for an alternative "measure" of popularity. This hack was originally implemented in 2011 when I was starting to learn about web technologies. It has been recently updated to use Freesound APIv2 and Web Audio API (with random HRTF panning for each sound!), but besides that the bad code has been left intact. Want to contribute? visit the <a href="http://github.com/ffont/freesound-timeline" target="_blank">code repository</a>.
 			</div>
 		</div>

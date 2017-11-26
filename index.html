@@ -34,6 +34,27 @@
 			.black_button:hover {background-color: #888; }
 			.red_text {color:#F31C36; }
 			.gray_text {color:#888; }
+			#evolution_percentage_indicator {
+				display: none; /* must be set to inline-block in code  */
+				width: 100px;
+				height: 24px;
+				background-color: #ffc9cf;
+				vertical-align: top;
+			}
+			#evolution_percentage_indicator_loader {
+				background-color: #F31C36;
+				width: 0%;
+				height: 100%;
+			}
+			@keyframes flash_input {
+			    from { background-color: #ffc9cf; }
+			    to { background-color: #fff; }
+			    
+			}
+			.flash_input {
+			    animation-name: flash_input;
+			    animation-duration: 500ms;
+			}    
 		</style>
 	</head>
 	<body>
@@ -46,18 +67,24 @@
 			var query_page_size = 15;
 			var play_timers = [];
 			var am = undefined; // Audio manager
-			var sounds_current_month = [];
-			var sounds_next_month = [];
+			var currentlyPlayedSounds = [];
+			var incomingSounds = [];
+			var incomingSoundsCopy = [];
 			var evolutionTimer = undefined;
-			var evolutionTimeInterval = 1000;
+			var evolutionTimeInterval = 100;
 			var evolutionCurrentStep = 0;
-			var evolutionResolution = 16; // Number of steps per month
+			var evolutionResolution = 100; // Number of steps per month
 
 			window.onload = function(){
 				freesound.setToken("d31c795be3f70f7f04b21aeca4c5b48a599db6e9");
 				parseHashAndSetParams();
 			};
 
+			function initParams(){
+				currentlyPlayedSounds = [];
+				incomingSounds = [];
+				incomingSoundsCopy = [];
+			}
 
 			// Audio stuff
 
@@ -126,6 +153,16 @@
 			        return min + Math.random() * (Math.abs(min)+max);
 			    }else {
 			        return min + Math.random() * max;
+			    }
+			}
+
+			function shuffleArray(array) {
+				// from https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
+			    for (var i = array.length - 1; i > 0; i--) {
+			        var j = Math.floor(Math.random() * (i + 1));
+			        var temp = array[i];
+			        array[i] = array[j];
+			        array[j] = temp;
 			    }
 			}
 
@@ -203,6 +240,31 @@
 				}
 			}
 
+			function displayEvolutionProgress(percectage){
+				if (evolutionTimer !== undefined){
+					// If evolution is active
+					document.getElementById('evolution_percentage_indicator').style.display = 'inline-block';
+					document.getElementById('evolution_percentage_indicator_loader').style.width = parseInt(percectage, 10) + '%';
+				} else {
+					document.getElementById('evolution_percentage_indicator').style.display = 'none';
+				}
+			}
+
+			function displayFlashNextMonth(){
+				// Input elements need to be removed and re-added for the flash effect to work every time
+				// See: https://css-tricks.com/restart-css-animation/
+
+				var month_input = document.getElementById('month');
+				var new_month_input = month_input.cloneNode(true);
+				month_input.parentNode.replaceChild(new_month_input, month_input);
+				document.getElementById('month').classList.add('flash_input');
+
+				var year_input = document.getElementById('year');
+				var new_year_input = year_input.cloneNode(true);
+				year_input.parentNode.replaceChild(new_year_input, year_input);
+				document.getElementById('year').classList.add('flash_input');
+			}
+
 
 			// Button interactions
 
@@ -210,8 +272,23 @@
 				lazyInitAudioManager(); // Init audio context here in response to user action
 				stopAllSounds();
 				document.getElementById('attributionList').innerHTML = '';
+				initParams();
 				setHash();
-				search();
+				search(function(data){
+	            	sounds = data.results;
+					shuffleArray(sounds);
+					currentlyPlayedSounds = sounds;
+	            	
+	            	startEvolution(); // Start when we receive first sounds
+		        });
+
+		        search_next(function(data){
+	            	sounds = data.results;
+					shuffleArray(sounds);
+	            	incomingSounds = sounds;
+	            	incomingSoundsCopy = incomingSounds; // Store a copy of all original incoming sounds for later use	                
+		        });
+
 			}
 
 			function next(){
@@ -267,80 +344,131 @@
 				}
 			}
 
-			function search(){
+			function search(onSuccess){
 
-				// Prepare commons search params
 				var q = "";
 				var p = 1;
 				var fields = "id,name,previews,username,license,url"
 				var s = "rating_desc"; // Default is by ratings
 				if (document.getElementById('alternative').checked){ s = "downloads_desc"; }
 
-				// Prepare filter for current month query
 				var month = document.getElementById('month').value;
 				var year = document.getElementById('year').value;
 				var next_month = get_next_month(month);
 				var next_year = get_next_year(year, month);
-				var f_current = "created:[" + year + "-" + month + "-1T00:00:00Z TO " + next_year + "-" + next_month + "-01T00:00:00Z] duration:[0.0 TO 60]";
+				var f = "created:[" + year + "-" + month + "-1T00:00:00Z TO " + next_year + "-" + next_month + "-01T00:00:00Z] duration:[0.0 TO 60]";
 
-				// Prepare filter for next month query
-				var next_next_year = get_next_year(next_year, next_month)
-				var next_next_month = get_next_month(next_month);
-				var f_next = "created:[" + next_year + "-" + next_month + "-1T00:00:00Z TO " + next_next_year + "-" + next_next_month + "-01T00:00:00Z] duration:[0.0 TO 60]";
-				
-				// Run query to get sounds from current month				
-				freesound.textSearch(q, {page:p, filter:f_current, sort:s, fields:fields, page_size:query_page_size},
+				freesound.textSearch(q, {page:p, filter:f, sort:s, fields:fields, page_size:query_page_size},
 		            function(data){
 		            	// Process successful response
-		            	sounds_current_month = data.results;
-		            	processResponse(data);
-		                
+		            	onSuccess(data);
 		            },function(){ 
 		            	// Process error response
 		            	document.getElementById("respSearch").innerHTML = "Error while searching..."; 
 		            }
 		        );
-
-		        // Run query to get sounds from next month				
-				freesound.textSearch(q, {page:p, filter:f_next, sort:s, fields:fields, page_size:query_page_size},
-		            function(data){
-		            	// Process successful response
-		            	sounds_next_month = data.results;
-		            	// processResponse(data);
-		            },function(){ 
-		            	// Process error response
-		            	document.getElementById("respSearch").innerHTML = "Error while searching..."; 
-		            }
-		        );
-
 				document.getElementById("respSearch").innerHTML = "";
 				document.getElementById("respSearch").innerHTML = "Waiting for results...";
+			}
+
+			function search_next(onSuccess, onFailure){
+
+				var q = "";
+				var p = 1;
+				var fields = "id,name,previews,username,license,url"
+				var s = "rating_desc"; // Default is by ratings
+				if (document.getElementById('alternative').checked){ s = "downloads_desc"; }
+
+				var month = document.getElementById('month').value;
+				var year = document.getElementById('year').value;
+				var next_month = get_next_month(month);
+				var next_year = get_next_year(year, month);
+				var next_next_year = get_next_year(next_year, next_month)
+				var next_next_month = get_next_month(next_month);
+				var f = "created:[" + next_year + "-" + next_month + "-1T00:00:00Z TO " + next_next_year + "-" + next_next_month + "-01T00:00:00Z] duration:[0.0 TO 60]";
+							
+				freesound.textSearch(q, {page:p, filter:f, sort:s, fields:fields, page_size:query_page_size},
+		            function(data){
+		            	// Process successful response
+		            	onSuccess(data);
+		            },function(){ 
+		            	// Process error response
+		            	if (onFailure !== undefined){
+		            		onFailure();	
+		            	}
+		            }
+		        );
 			}
 
 			function step() {
 
 				var month = document.getElementById('month').value;
 				var year = document.getElementById('year').value;
-				console.log('Processing step ' + evolutionCurrentStep + ' of ' + month + '/' + year);
+				var monthProgress = 100 * (evolutionCurrentStep + 1) / evolutionResolution;
+				displayEvolutionProgress(Math.floor(monthProgress));
+				//console.log('Processing step ' + evolutionCurrentStep + ' of ' + month + '/' + year + ' (' + monthProgress + ')');
 
+				setHash(); // Update hash in URL
 
-				if (evolutionCurrentStep === (evolutionResolution - 1)){
-					// fully advance 1 month
-					// search sounds for new months
+				// Update currentlyPlayedSounds by adding some from incomingSounds
+				if (evolutionCurrentStep > 0){
+					if (incomingSounds.length > 0){ // If there are still sounds to be added
+						
+						var soundsShouldHaveBeenAdded = Math.floor(monthProgress / 100 * incomingSoundsCopy.length);
+						var soundsHaveBeenAdded = incomingSoundsCopy.length - incomingSounds.length;
+						var nSoundsToAdd = soundsShouldHaveBeenAdded - soundsHaveBeenAdded
+
+						for (var i=0; i<nSoundsToAdd; i++){
+							// Remove one sound from the top of currentlyPlayedSounds, add one sound from incoming at the end
+							currentlyPlayedSounds = currentlyPlayedSounds.slice(1, currentlyPlayedSounds.length);
+							currentlyPlayedSounds.push(incomingSounds[0]);
+							incomingSounds = incomingSounds.slice(1, incomingSounds.length);
+						}
+
+						if (nSoundsToAdd > 0){
+							var ids = []
+							for (var i=0; i<currentlyPlayedSounds.length; i++){
+								ids.push(currentlyPlayedSounds[i].id);
+							}
+							console.log('currentlyPlayedSounds: ', ids.join(','));
+
+							var ids = []
+							for (var i=0; i<incomingSounds.length; i++){
+								ids.push(incomingSounds[i].id);
+							}
+							console.log('incomingSounds: ', ids.join(','));
+						}
+					}
+				}
+
+				// TODO: update audio players, etc.
+
+				if (evolutionCurrentStep === (evolutionResolution - 1)){  // Last step
+					// Advance 1 month
 					var next_month = get_next_month(month);
 					var next_year = get_next_year(year, month);
 					document.getElementById('month').value = next_month;
 					document.getElementById('year').value = next_year;
-					play();
-					setHash();
+					displayFlashNextMonth();
+
+					// Set currentlyPlayedSounds to incomingSoundsCopy (just in case it had not been fully updated after all the steps)
+					currentlyPlayedSounds = incomingSoundsCopy;
+					incomingSounds = [];
+					incomingSoundsCopy = [];
+
+					// Search new sounds and store in incoming
+					search_next(function(data){
+						sounds = data.results;
+						shuffleArray(sounds);
+						incomingSounds = sounds;
+						incomingSoundsCopy = incomingSounds; // Store a copy of all original incoming sounds for later use
+					});
 					evolutionCurrentStep = 0; // Restart step counter
 				} else {
-					// Check in which position we are with respect from one month to the next
-					// Decide whether to remove/add sounds to the pool
-					
 					evolutionCurrentStep += 1; // Advance step
 				}
-				
+
+				// Schedule next step
 				evolutionTimer = setTimeout(function(){
 					step();
 				}, evolutionTimeInterval);
@@ -355,6 +483,7 @@
 			function stopEvolution(){
 				clearTimeout(evolutionTimer);
 				evolutionTimer = undefined;
+				displayEvolutionProgress(0); // Will hide it as timer is undefined
 			}
 
 		</script>
@@ -367,17 +496,17 @@
 				enter year (2005-now): <input type="text" id="year" value="2011" size=4 maxlength=4>
 				<br>
 				<span class="slider_label">density:</span> <input id="complexity" type="range" min=0.05 max=1.0 step='.05' value=1.0 oninput="setComplexity()" onchange="setComplexity()">
-				
+				<br>
+				use alternative popularity measure: <input type="checkbox" id="alternative">
 			</p>
 			
-			<p>
+			<div>
 				<button id="search" onclick="play()">play!</button>
-				<input type="checkbox" id="alternative">
+				<div id="evolution_percentage_indicator"><div id="evolution_percentage_indicator_loader"></div></div>
 				<br>
 				<button onclick="previous()"><<</button>
 				<button onclick="next()">>></button>
-			</p>
-			
+			</div>
 			
 			<br><div> 
 				<span id="respSearch">please <b>use headphones</b> for the full experience</span>

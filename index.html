@@ -192,15 +192,18 @@
 					soundscape_compleixty = complexity;
 					document.getElementById("complexity").value = soundscape_compleixty;	
 				}
-				if (auto_advance == 'true') {
-					document.getElementById("auto_advance").checked = true;	
-				}
 				if (evolution_percentage) {
 					var newEvolutionCurrentStep = parseInt(evolution_percentage / 100 * evolutionResolution, 10);
 					if ((newEvolutionCurrentStep > evolutionResolution) || (newEvolutionCurrentStep < 0)){
 						newEvolutionCurrentStep = 0;
 					}
 					evolutionCurrentStep = newEvolutionCurrentStep;  // Set current evolution step
+				}
+				if (auto_advance == 'true') {
+					document.getElementById("auto_advance").checked = true;	
+					displayEvolutionProgress();
+				} else {
+					hideEvolutionProgress();
 				}
 			}
 
@@ -258,18 +261,18 @@
 			}
 
 			function getCurrentEvolutionPercentage(){
-				return Math.floor(100 * (evolutionCurrentStep + 1) / evolutionResolution);
+				return Math.floor(100 * (evolutionCurrentStep) / evolutionResolution);
 			}
 
 			function displayEvolutionProgress(){
 				var percentage = getCurrentEvolutionPercentage();
-				if (evolutionTimer !== undefined){
-					// If evolution is active
-					document.getElementById('evolution_percentage_indicator').style.display = 'inline-block';
-					document.getElementById('evolution_percentage_indicator_loader').style.width = parseInt(percentage, 10) + '%';
-				} else {
-					document.getElementById('evolution_percentage_indicator').style.display = 'none';
-				}
+				// If evolution is active
+				document.getElementById('evolution_percentage_indicator').style.display = 'inline-block';
+				document.getElementById('evolution_percentage_indicator_loader').style.width = parseInt(percentage, 10) + '%';
+			}
+
+			function hideEvolutionProgress(){
+				document.getElementById('evolution_percentage_indicator').style.display = 'none';
 			}
 
 			function displayFlashNextMonth(){
@@ -330,6 +333,7 @@
 				if (evolutionTimer !== undefined) {
 					// If evolution is running stop it and set step to 0
 					stopEvolution();
+					hideEvolutionProgress();
 				}
 				evolutionCurrentStep = 0;
 				play();
@@ -345,6 +349,7 @@
 				if (evolutionTimer !== undefined) {
 					// If evolution is running stop it and set step to 0
 					stopEvolution();
+					hideEvolutionProgress();
 				}
 				evolutionCurrentStep = 0;
 				play();
@@ -368,13 +373,22 @@
 					if (isRunning){
 						stopEvolution();
 					}
+					hideEvolutionProgress();
 				} else {
 					if (currentlyPlayedSounds.length > 0){
 						// If sounds are being played, start evolution now
 						startEvolution();
 					}
+					displayEvolutionProgress();
 				}
 				setHash();
+			}
+
+			function panic(){
+				if (evolutionTimer !== undefined){
+					stopEvolution();
+				}
+				stopAllSounds();
 			}
 
 			// Search and interaction with Freesound
@@ -429,6 +443,8 @@
 		        );
 				document.getElementById("respSearch").innerHTML = "Waiting for results...";
 			}
+
+			// Evolution
 
 			function step() {
 
@@ -519,7 +535,6 @@
 			function stopEvolution(){
 				clearTimeout(evolutionTimer);
 				evolutionTimer = undefined;
-				displayEvolutionProgress(); // Will hide it as timer is undefined
 			}
 
 		</script>
@@ -550,7 +565,7 @@
 				<div id="volumeDisplay" style="display:none;"><span class="slider_label">volume:</span> <input id="volume" type="range" min=0.0 max=1.0 step='.05' value=1.0 oninput="setVolume()" onchange="setVolume()"></div>
 			</div>
 			<br>
-				<div id="panic1" style="display:none"><button id="stopAllSounds" class="black_button" onclick="stopAllSounds()">panic!</button></div>
+				<div id="panic1" style="display:none"><button id="stopAllSounds" class="black_button" onclick="panic()">panic!</button></div>
 				<div id="panic2">no need for panic button... yet!</div>
 			<br>
 			<div id="attributionList"></div>

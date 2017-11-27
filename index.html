@@ -125,6 +125,30 @@
 				}	
 			}
 
+			function playCurrentSounds(){
+				// Compare currentlyPlayedSounds and the sounds that are really being played in am:
+				// 1) add sounds to am which are not really being played but are in currentlyPlayedSounds
+				// 2) remove sounds from am which are not in currentlyPlayedSounds
+				// 3) Update attribution list accordingly
+
+				/*
+				// Simple temp implementation (TODO: update that!)
+				stopAllSounds();
+
+				document.getElementById('attributionList').innerHTML = '<span class="gray_text">Sounds used:</span> <br><br>';
+				for (i =0;i<currentlyPlayedSounds.length;i++){  
+                    var snd = currentlyPlayedSounds[i];
+                    var label = '<a href="' + snd.url + '" target="_blank">' + snd.name + '</a> by <b>' + snd.username + '</b>';
+                    
+                    playSound(label, snd.previews['preview-hq-mp3'])	 // ogg seems to fail on safari...
+
+                    // Add attribution
+                    document.getElementById('attributionList').innerHTML += 
+                    	label + ' | <a href="' + snd.license + '" target="_blank">' + getLicenseName(snd.license) + '</a><br>'
+                }
+                */
+			}
+
 			function stopAllSounds(){
 
 				// Stop all playing audio buffers (if am was ever initialized only)
@@ -136,9 +160,6 @@
 					clearTimeout(timer);
 				}
 				play_timers = [];
-
-				// Reset sound arrays
-				initSoundArrays()
 
 				// Update UI
 				document.getElementById("panic1").style.display = 'none';
@@ -294,9 +315,9 @@
 			// Button interactions
 
 			function play(){
+				document.getElementById('attributionList').innerHTML = '';
 				lazyInitAudioManager(); // Init audio context here in response to user action
 				stopAllSounds();
-				document.getElementById('attributionList').innerHTML = '';
 				initSoundArrays();
 				setHash();
 
@@ -307,6 +328,7 @@
 	            	sounds = data.results;
 					shuffleArray(sounds);
 					currentlyPlayedSounds = sounds;
+					playCurrentSounds();
 	            	if (document.getElementById('auto_advance').checked){
 	            		startEvolution(); // Start when we receive first sounds	
 	            	}
@@ -389,32 +411,10 @@
 					stopEvolution();
 				}
 				stopAllSounds();
+				initSoundArrays();
 			}
 
 			// Search and interaction with Freesound
-
-			function processResponse(data) {
-				var sounds = data.results;
-				if (sounds.length == 0){
-					document.getElementById("respSearch").innerHTML = "";
-					document.getElementById("respSearch").innerHTML = "No results...";
-				}else{
-					document.getElementById("respSearch").innerHTML = "";
-					document.getElementById("respSearch").innerHTML = "Loading sounds... will begin playing at any moment...";
-
-					document.getElementById('attributionList').innerHTML = '<span class="gray_text">Sounds used:</span> <br><br>';
-					for (i =0;i<sounds.length;i++){  
-	                    var snd = sounds[i];
-	                    var label = '<a href="' + snd.url + '" target="_blank">' + snd.name + '</a> by <b>' + snd.username + '</b>';
-	                    
-	                    playSound(label, snd.previews['preview-hq-mp3'])	 // ogg seems to fail on safari...
-
-	                    // Add attribution
-	                    document.getElementById('attributionList').innerHTML += 
-	                    	label + ' | <a href="' + snd.license + '" target="_blank">' + getLicenseName(snd.license) + '</a><br>'
-	                }
-				}
-			}
 
 			function search(month, year, onSuccess, onFailure){
 
@@ -489,7 +489,8 @@
 					}
 				}
 
-				// TODO: update audio players, etc.
+				// Update audio players, etc.
+				playCurrentSounds();
 
 				if (evolutionCurrentStep >= (evolutionResolution - 1)){  // Last step
 					// Advance 1 month

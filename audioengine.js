@@ -149,10 +149,20 @@ AudioManager.prototype.playBufferByName = function(name, time, options) {
   if (time === undefined){ time = 0; }
   if (name in this){
     var buffer_node = playBuffer(this[name], time, options);
-    BUFFER_NODES.push(buffer_node)
+    BUFFER_NODES.push({name: name, node: buffer_node})
   } else {
     log('Error: "' + name + '" buffer not loaded!')
   }
+}
+
+AudioManager.prototype.getBufferList = function(value) {
+  var buffers = [];
+  for(var key in this){
+    if (this[key] instanceof AudioBuffer){
+      buffers.push(key);  
+    } 
+  }
+  return buffers;
 }
 
 AudioManager.prototype.playSoundFromURL = function(url, time, options) {
@@ -176,14 +186,49 @@ AudioManager.prototype.setMainVolume = function(value) {
   context.gainNode.gain.value = value;
 }
 
-AudioManager.prototype.stopAllBuffers = function(disableOnEnded) {
+AudioManager.prototype.stopAllBufferNodes = function(disableOnEnded, hardStop) {
   for(i=0; i<BUFFER_NODES.length; i++) {
     if (disableOnEnded) {
-      BUFFER_NODES[i].onended = undefined; // Set onended call to undefined just in case it is set  
+      BUFFER_NODES[i].node.onended = undefined; // Set onended call to undefined just in case it is set  
     }
-    BUFFER_NODES[i].stop();
+    if (hardStop) {
+      BUFFER_NODES[i].node.stop();  
+    }
   }
   BUFFER_NODES = [];
+
+  // TODO: remove actual buffers data from this?
+}
+
+AudioManager.prototype.stopBufferNodesForSound = function(name, disableOnEnded, hardStop) {
+  log('Removing buffer nodes for sound: ' + name);
+  NEW_BUFFER_NODES = [];
+  for (i in BUFFER_NODES){
+    if (BUFFER_NODES[i].name !== name){
+      NEW_BUFFER_NODES.push(BUFFER_NODES[i]);
+    } else {
+      if (disableOnEnded){
+        BUFFER_NODES[i].node.onended = undefined; // Set onended call to undefined just in case it is set    
+      }
+      if (hardStop){
+        BUFFER_NODES[i].node.stop();  
+      }
+    }
+  }
+  BUFFER_NODES = NEW_BUFFER_NODES;
+
+  // TODO: remove actual buffer data from this?
+}
+
+AudioManager.prototype.getAllUniqueBufferNodesList = function(value) {
+  var keys = [];
+  for (var item in BUFFER_NODES){
+    var key = BUFFER_NODES[item].name;
+    if (keys.indexOf(key) === -1){
+      keys.push(key);
+    }
+  }
+  return keys;
 }
 
 // Initialize things

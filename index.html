@@ -71,7 +71,7 @@
 			var incomingSounds = [];
 			var incomingSoundsCopy = [];
 			var evolutionTimer = undefined;
-			var evolutionTimeInterval = 100;
+			var evolutionTimeInterval = 1000;
 			var evolutionCurrentStep = 0;
 			var evolutionResolution = 100; // Number of steps per month
 
@@ -107,6 +107,7 @@
 					am.playSoundFromURL(url, 0, {
 						panHRTF: {x:randomBetween(-1.0, 1.0), y:randomBetween(-2.0, 2.0), z:randomBetween(-2.0, 2.0) },
 						onended: function(event){
+							//am.stopBufferNodesForSound(url, disableOnEnded=true, hardStop=true); // clear existing buffer nodes
 							playSound(name, url);  // On end, play again the sound
 							// NOTE: we don't use Web Audio API loop prop here as it does not trigger onended event
 						}
@@ -127,32 +128,51 @@
 
 			function playCurrentSounds(){
 				// Compare currentlyPlayedSounds and the sounds that are really being played in am:
+				
+				var currentBufferNodes = am.getAllUniqueBufferNodesList();
+				
 				// 1) add sounds to am which are not really being played but are in currentlyPlayedSounds
-				// 2) remove sounds from am which are not in currentlyPlayedSounds
+				for (i in currentlyPlayedSounds){
+                    var snd = currentlyPlayedSounds[i];
+                    var url = snd.previews['preview-hq-mp3']; // ogg seems to fail on safari...
+                    if (currentBufferNodes.indexOf(url) === -1){
+                    	// If sound not present in buffer, start to play it
+                    	var label = '<a href="' + snd.url + '" target="_blank">' + snd.name + '</a> by <b>' + snd.username + '</b>';
+                    	playSound(label, url);	
+                    	console.log('Adding sound to play ', url)
+                    }
+                }
+
+                // 2) remove sounds from am which are not in currentlyPlayedSounds
+                var currentlyPlayedSoundsURLs = [];  // Get currently played sound URLs (useful later)
+				for (i in currentlyPlayedSounds){
+					var url = currentlyPlayedSounds[i].previews['preview-hq-mp3']; // ogg seems to fail on safari...
+					currentlyPlayedSoundsURLs.push(url);
+				}
+				for (i in currentBufferNodes){
+					var name = currentBufferNodes[i];
+					if (currentlyPlayedSoundsURLs.indexOf(name) === -1){
+						// If buffer not present in sounds, remove it
+						am.stopBufferNodesForSound(name, disableOnEnded=true, hardStop=true); // TODO: try to set hard stop to false and see if it makes difference
+						console.log('Removing sound from play ', name)
+					}
+				}
+
 				// 3) Update attribution list accordingly
-
-				/*
-				// Simple temp implementation (TODO: update that!)
-				stopAllSounds();
-
 				document.getElementById('attributionList').innerHTML = '<span class="gray_text">Sounds used:</span> <br><br>';
-				for (i =0;i<currentlyPlayedSounds.length;i++){  
+				for (i in currentlyPlayedSounds){
                     var snd = currentlyPlayedSounds[i];
                     var label = '<a href="' + snd.url + '" target="_blank">' + snd.name + '</a> by <b>' + snd.username + '</b>';
-                    
-                    playSound(label, snd.previews['preview-hq-mp3'])	 // ogg seems to fail on safari...
-
-                    // Add attribution
                     document.getElementById('attributionList').innerHTML += 
                     	label + ' | <a href="' + snd.license + '" target="_blank">' + getLicenseName(snd.license) + '</a><br>'
                 }
-                */
+                
 			}
 
 			function stopAllSounds(){
 
 				// Stop all playing audio buffers (if am was ever initialized only)
-				am.stopAllBuffers(disableOnEnded=true);	
+				am.stopAllBufferNodes(disableOnEnded=true, hardStop=true);	
 				
 				// Clear all existing timeouts
 				for (var i =0;i<play_timers.length;i++){  

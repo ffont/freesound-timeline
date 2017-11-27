@@ -62,7 +62,7 @@
 
 			// Global variables and init
 
-			var soundscape_compleixty = 1.0;
+			var soundscape_compleixty = 0.5;
 			var soundscape_complexity_interval = 3000;
 			var query_page_size = 15;
 			var play_timers = [];
@@ -77,6 +77,7 @@
 
 			window.onload = function(){
 				freesound.setToken("d31c795be3f70f7f04b21aeca4c5b48a599db6e9");
+				document.getElementById('complexity').value = soundscape_compleixty;
 				parseHashAndSetParams();
 			};
 
@@ -84,6 +85,7 @@
 				currentlyPlayedSounds = [];
 				incomingSounds = [];
 				incomingSoundsCopy = [];
+				play_timers = [];
 			}
 
 			// Audio stuff
@@ -95,6 +97,8 @@
 				// is only played when users have made some interactions
 				if (am === undefined) {
 					am = initAudioManager();
+					document.getElementById('volume').value = 0.5;
+					setVolume();
 				}
 			}
 
@@ -103,11 +107,11 @@
 				// Only play sound if a random number is above a specific probability, otherwise try
 				// again after some time.
 				if (Math.random() >= (1.0 - soundscape_compleixty)) {
+					clearPlayTimersForSound(url); // Remove existing play timer for this sound (if any)
 					document.getElementById("respSearch").innerHTML = "Playing: " + name;
 					am.playSoundFromURL(url, 0, {
 						panHRTF: {x:randomBetween(-1.0, 1.0), y:randomBetween(-2.0, 2.0), z:randomBetween(-2.0, 2.0) },
 						onended: function(event){
-							//am.stopBufferNodesForSound(url, disableOnEnded=true, hardStop=true); // clear existing buffer nodes
 							playSound(name, url);  // On end, play again the sound
 							// NOTE: we don't use Web Audio API loop prop here as it does not trigger onended event
 						}
@@ -122,7 +126,7 @@
 					var play_timer = setTimeout(function(){
 						playSound(name, url);
 					}, soundscape_complexity_interval);
-					play_timers.push(play_timer);
+					play_timers.push({name: url, timer: play_timer});
 				}	
 			}
 
@@ -130,8 +134,13 @@
 				// Compare currentlyPlayedSounds and the sounds that are really being played in am:
 				
 				var currentBufferNodes = am.getAllUniqueBufferNodesList();
+				var nAddedToPlay = 0;
+				var nRemovedFromPlay = 0;
 				
 				// 1) add sounds to am which are not really being played but are in currentlyPlayedSounds
+				for (i in play_timers){
+					currentBufferNodes.push(play_timers[i].name);  // Expand with sound URLs which are waiting to be played in timer
+				}
 				for (i in currentlyPlayedSounds){
                     var snd = currentlyPlayedSounds[i];
                     var url = snd.previews['preview-hq-mp3']; // ogg seems to fail on safari...
@@ -139,7 +148,8 @@
                     	// If sound not present in buffer, start to play it
                     	var label = '<a href="' + snd.url + '" target="_blank">' + snd.name + '</a> by <b>' + snd.username + '</b>';
                     	playSound(label, url);	
-                    	console.log('Adding sound to play ', url)
+                    	//console.log('Adding sound to play ', url);
+                    	nAddedToPlay += 1;
                     }
                 }
 
@@ -153,9 +163,14 @@
 					var name = currentBufferNodes[i];
 					if (currentlyPlayedSoundsURLs.indexOf(name) === -1){
 						// If buffer not present in sounds, remove it
-						am.stopBufferNodesForSound(name, disableOnEnded=true, hardStop=true); // TODO: try to set hard stop to false and see if it makes difference
-						console.log('Removing sound from play ', name)
+						am.stopBufferNodesForSound(name, disableOnEnded=true, hardStop=true, removeBuffer=true); // TODO: try to set hard stop to false and see if it makes difference
+						//console.log('Removing sound from play ', name);
+						nRemovedFromPlay += 1;
 					}
+				}
+
+				if ((nAddedToPlay > 0) || (nRemovedFromPlay > 0)){
+					console.log(nAddedToPlay + ' sound added to play, ' + nRemovedFromPlay + ' removed');	
 				}
 
 				// 3) Update attribution list accordingly
@@ -169,14 +184,27 @@
                 
 			}
 
+			function clearPlayTimersForSound(url){
+				var new_play_timers = [];
+				for (var i =0;i<play_timers.length;i++){  
+					if (play_timers[i].name === url){
+						var timer = play_timers[i].timer;
+						clearTimeout(timer);
+					} else {
+						new_play_timers.push(play_timers[i]);
+					}
+				}
+				play_timers = new_play_timers;
+			}
+
 			function stopAllSounds(){
 
 				// Stop all playing audio buffers (if am was ever initialized only)
-				am.stopAllBufferNodes(disableOnEnded=true, hardStop=true);	
+				am.stopAllBufferNodes(disableOnEnded=true, hardStop=true, removeBuffers=true);	
 				
 				// Clear all existing timeouts
 				for (var i =0;i<play_timers.length;i++){  
-					var timer = play_timers[i];
+					var timer = play_timers[i].timer;
 					clearTimeout(timer);
 				}
 				play_timers = [];
@@ -302,7 +330,7 @@
 			}
 
 			function getCurrentEvolutionPercentage(){
-				return Math.floor(100 * (evolutionCurrentStep) / evolutionResolution);
+				return Math.ceil(100 * (evolutionCurrentStep) / evolutionResolution);
 			}
 
 			function displayEvolutionProgress(){
@@ -404,7 +432,7 @@
 			}
 
 			function setVolume(){
-				var value = document.getElementById('volume').value;
+				value = document.getElementById('volume').value;	
 				am.setMainVolume(value);
 			}
 
@@ -476,6 +504,7 @@
 				setHash(); // Update hash in URL
 
 				// Update currentlyPlayedSounds by adding some from incomingSounds
+				var madeAnyChanges = false;
 				if (evolutionCurrentStep > 0){
 					if ((currentlyPlayedSounds.length > 0) && (incomingSounds.length > 0)){ // If there are still sounds to be added
 						
@@ -492,25 +521,15 @@
 
 						if (nSoundsToAdd > 0){
 							console.log('Moved ' + nSoundsToAdd + ' sounds from incoming to current');
-							/*
-							var ids = []
-							for (var i=0; i<currentlyPlayedSounds.length; i++){
-								ids.push(currentlyPlayedSounds[i].id);
-							}
-							console.log('currentlyPlayedSounds: ', ids.join(','));
-
-							var ids = []
-							for (var i=0; i<incomingSounds.length; i++){
-								ids.push(incomingSounds[i].id);
-							}
-							console.log('incomingSounds: ', ids.join(','));
-							*/
+							madeAnyChanges = true;
 						}
 					}
 				}
 
 				// Update audio players, etc.
-				playCurrentSounds();
+				if (madeAnyChanges) {
+					playCurrentSounds();	
+				}
 
 				if (evolutionCurrentStep >= (evolutionResolution - 1)){  // Last step
 					// Advance 1 month
@@ -548,6 +567,7 @@
 			}
 
 			function startEvolution(){
+				displayEvolutionProgress();
 				evolutionTimer = setTimeout(function(){
 					step();
 				}, evolutionTimeInterval);

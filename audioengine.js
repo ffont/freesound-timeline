@@ -186,7 +186,7 @@ AudioManager.prototype.setMainVolume = function(value) {
   context.gainNode.gain.value = value;
 }
 
-AudioManager.prototype.stopAllBufferNodes = function(disableOnEnded, hardStop) {
+AudioManager.prototype.stopAllBufferNodes = function(disableOnEnded, hardStop, removeBuffers) {
   for(i=0; i<BUFFER_NODES.length; i++) {
     if (disableOnEnded) {
       BUFFER_NODES[i].node.onended = undefined; // Set onended call to undefined just in case it is set  
@@ -197,10 +197,15 @@ AudioManager.prototype.stopAllBufferNodes = function(disableOnEnded, hardStop) {
   }
   BUFFER_NODES = [];
 
-  // TODO: remove actual buffers data from this?
+  if (removeBuffers){
+    var bufferList = this.getBufferList();
+    for (i in bufferList){
+      this[bufferList[i]] = undefined; // remove actual buffer data from audio manager  
+    }
+  }
 }
 
-AudioManager.prototype.stopBufferNodesForSound = function(name, disableOnEnded, hardStop) {
+AudioManager.prototype.stopBufferNodesForSound = function(name, disableOnEnded, hardStop, removeBuffer) {
   log('Removing buffer nodes for sound: ' + name);
   NEW_BUFFER_NODES = [];
   for (i in BUFFER_NODES){
@@ -216,8 +221,10 @@ AudioManager.prototype.stopBufferNodesForSound = function(name, disableOnEnded, 
     }
   }
   BUFFER_NODES = NEW_BUFFER_NODES;
-
-  // TODO: remove actual buffer data from this?
+  
+  if (removeBuffer){
+    this[name] = undefined; // remove actual buffer data from audio manager  
+  }
 }
 
 AudioManager.prototype.getAllUniqueBufferNodesList = function(value) {

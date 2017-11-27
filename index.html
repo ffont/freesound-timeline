@@ -225,7 +225,7 @@
 
 			}
 
-			function get_next_month(month){
+			function getNextMonth(month){
 				if (parseInt(month,10) >= 12){
 					return "1"
 				}else{
@@ -233,7 +233,7 @@
 				}
 			}
 			
-			function get_next_year(year,month){
+			function getNextYear(year,month){
 				if (parseInt(month,10) >= 12){
 					return (parseInt(year,10) + 1).toString()
 				}else{
@@ -241,7 +241,7 @@
 				}
 			}
 			
-			function get_previous_month(month){
+			function getPreviousMonth(month){
 				if (parseInt(month,10) <= 1){
 					return "12"
 				}else{
@@ -249,7 +249,7 @@
 				}
 			}
 			
-			function get_previous_year(year,month){
+			function getPreviousYear(year,month){
 				if (parseInt(month,10) <= 1){
 					return (parseInt(year,10) - 1).toString()
 				}else{
@@ -310,8 +310,8 @@
 		        });
 
 				// Get sounds for next month
-				var next_month = get_next_month(month);
-				var next_year = get_next_year(year, month);
+				var next_month = getNextMonth(month);
+				var next_year = getNextYear(year, month);
 		        search(next_month, next_year, function(data){
 	            	sounds = data.results;
 					shuffleArray(sounds);
@@ -323,8 +323,8 @@
 			function next(){
 				var month = document.getElementById('month').value;
 				var year = document.getElementById('year').value;
-				document.getElementById('month').value = get_next_month(month);
-				document.getElementById('year').value = get_next_year(year,month);
+				document.getElementById('month').value = getNextMonth(month);
+				document.getElementById('year').value = getNextYear(year,month);
 				displayFlashNextMonth();
 				setHash();
 				if (evolutionTimer !== undefined) {
@@ -338,8 +338,8 @@
 			function previous(){
 				var month = document.getElementById('month').value;
 				var year = document.getElementById('year').value;
-				document.getElementById('month').value = get_previous_month(month);
-				document.getElementById('year').value = get_previous_year(year,month);
+				document.getElementById('month').value = getPreviousMonth(month);
+				document.getElementById('year').value = getPreviousYear(year,month);
 				displayFlashNextMonth();
 				setHash();
 				if (evolutionTimer !== undefined) {
@@ -410,8 +410,8 @@
 				var s = "rating_desc"; // Default is by ratings
 				if (document.getElementById('alternative').checked){ s = "downloads_desc"; }
 
-				var next_month = get_next_month(month);
-				var next_year = get_next_year(year, month);
+				var next_month = getNextMonth(month);
+				var next_year = getNextYear(year, month);
 				var f = "created:[" + year + "-" + month + "-1T00:00:00Z TO " + next_year + "-" + next_month + "-01T00:00:00Z] duration:[0.0 TO 60]";
 
 				freesound.textSearch(q, {page:p, filter:f, sort:s, fields:fields, page_size:query_page_size},
@@ -477,8 +477,8 @@
 
 				if (evolutionCurrentStep >= (evolutionResolution - 1)){  // Last step
 					// Advance 1 month
-					var next_month = get_next_month(month);
-					var next_year = get_next_year(year, month);
+					var next_month = getNextMonth(month);
+					var next_year = getNextYear(year, month);
 					document.getElementById('month').value = next_month;
 					document.getElementById('year').value = next_year;
 					displayFlashNextMonth();
@@ -491,8 +491,8 @@
 					// Search new sounds and store in incoming
 					var month = document.getElementById('month').value;
 					var year = document.getElementById('year').value;
-					var next_month = get_next_month(month);
-					var next_year = get_next_year(year, month);
+					var next_month = getNextMonth(month);
+					var next_year = getNextYear(year, month);
 					search(next_month, next_year, function(data){
 						sounds = data.results;
 						shuffleArray(sounds);

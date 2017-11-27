@@ -78,6 +78,26 @@
 			window.onload = function(){
 				freesound.setToken("d31c795be3f70f7f04b21aeca4c5b48a599db6e9");
 				document.getElementById('complexity').value = soundscape_compleixty;
+
+				// Chose random month/year
+				var currentYear = (new Date()).getFullYear();
+				var oldestYear = 2005;
+				var randomYear = oldestYear + parseInt(Math.random() * ((currentYear + 1) - oldestYear), 10)
+				var randomMonth = parseInt(Math.random() * 12, 10) + 1;
+				if (randomYear === oldestYear){
+					if (randomMonth < 3){
+						randomMonth = 3;
+					}
+				} else if (randomYear === currentYear){
+					if (randomMonth >= (new Date()).getMonth()){
+						randomMonth = (new Date()).getMonth() -1;
+					}
+				}
+				document.getElementById('year').value = randomYear;
+				document.getElementById('month').value = randomMonth;
+
+
+
 				parseHashAndSetParams();
 			};
 

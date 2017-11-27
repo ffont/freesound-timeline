@@ -6,7 +6,7 @@
 		<title>fressound timeline</title>
 		<script type="text/javascript" src="freesound.js"></script>
 		<script src="audioengine.js"></script>
-		<link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+		<!--link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet"-->
 		<link href="slider.css" rel="stylesheet">
 		<style>
 			body {font-family: 'Open Sans', sans-serif; font-size: 12px; color:#333;}
@@ -53,7 +53,7 @@
 			}
 			.flash_input {
 			    animation-name: flash_input;
-			    animation-duration: 500ms;
+			    animation-duration: 900ms;
 			}    
 		</style>
 	</head>
@@ -80,7 +80,7 @@
 				parseHashAndSetParams();
 			};
 
-			function initParams(){
+			function initSoundArrays(){
 				currentlyPlayedSounds = [];
 				incomingSounds = [];
 				incomingSoundsCopy = [];
@@ -137,6 +137,9 @@
 				}
 				play_timers = [];
 
+				// Reset sound arrays
+				initSoundArrays()
+
 				// Update UI
 				document.getElementById("panic1").style.display = 'none';
 				document.getElementById("panic2").style.display = 'block';
@@ -175,6 +178,8 @@
 				var year = hash[1];
 				var alternative = hash[2];
 				var complexity = hash[3];
+				var auto_advance = hash[4];
+				var evolution_percentage = hash[5];
 				
 				if ((month !== undefined) && (year !== undefined)){
 					document.getElementById('month').value = month;
@@ -187,13 +192,25 @@
 					soundscape_compleixty = complexity;
 					document.getElementById("complexity").value = soundscape_compleixty;	
 				}
+				if (auto_advance == 'true') {
+					document.getElementById("auto_advance").checked = true;	
+				}
+				if (evolution_percentage) {
+					var newEvolutionCurrentStep = parseInt(evolution_percentage / 100 * evolutionResolution, 10);
+					if ((newEvolutionCurrentStep > evolutionResolution) || (newEvolutionCurrentStep < 0)){
+						newEvolutionCurrentStep = 0;
+					}
+					evolutionCurrentStep = newEvolutionCurrentStep;  // Set current evolution step
+				}
 			}
 
 			function setHash(){
 				var hash = document.getElementById('month').value + ',' + 
 						   document.getElementById('year').value + ',' + 
 						   document.getElementById('alternative').checked + ',' +
-						   document.getElementById("complexity").value
+						   document.getElementById('complexity').value + ',' +
+						   document.getElementById('auto_advance').checked + ',' +
+						   getCurrentEvolutionPercentage();
 						   ;
 				parent.location.hash = hash;
 			}
@@ -240,11 +257,16 @@
 				}
 			}
 
-			function displayEvolutionProgress(percectage){
+			function getCurrentEvolutionPercentage(){
+				return Math.floor(100 * (evolutionCurrentStep + 1) / evolutionResolution);
+			}
+
+			function displayEvolutionProgress(){
+				var percentage = getCurrentEvolutionPercentage();
 				if (evolutionTimer !== undefined){
 					// If evolution is active
 					document.getElementById('evolution_percentage_indicator').style.display = 'inline-block';
-					document.getElementById('evolution_percentage_indicator_loader').style.width = parseInt(percectage, 10) + '%';
+					document.getElementById('evolution_percentage_indicator_loader').style.width = parseInt(percentage, 10) + '%';
 				} else {
 					document.getElementById('evolution_percentage_indicator').style.display = 'none';
 				}
@@ -272,23 +294,30 @@
 				lazyInitAudioManager(); // Init audio context here in response to user action
 				stopAllSounds();
 				document.getElementById('attributionList').innerHTML = '';
-				initParams();
+				initSoundArrays();
 				setHash();
-				search(function(data){
+
+				// Get sounds for current month
+				var month = document.getElementById('month').value;
+				var year = document.getElementById('year').value;
+				search(month, year, function(data){
 	            	sounds = data.results;
 					shuffleArray(sounds);
 					currentlyPlayedSounds = sounds;
-	            	
-	            	startEvolution(); // Start when we receive first sounds
+	            	if (document.getElementById('auto_advance').checked){
+	            		startEvolution(); // Start when we receive first sounds	
+	            	}
 		        });
 
-		        search_next(function(data){
+				// Get sounds for next month
+				var next_month = get_next_month(month);
+				var next_year = get_next_year(year, month);
+		        search(next_month, next_year, function(data){
 	            	sounds = data.results;
 					shuffleArray(sounds);
 	            	incomingSounds = sounds;
 	            	incomingSoundsCopy = incomingSounds; // Store a copy of all original incoming sounds for later use	                
 		        });
-
 			}
 
 			function next(){
@@ -296,6 +325,13 @@
 				var year = document.getElementById('year').value;
 				document.getElementById('month').value = get_next_month(month);
 				document.getElementById('year').value = get_next_year(year,month);
+				displayFlashNextMonth();
+				setHash();
+				if (evolutionTimer !== undefined) {
+					// If evolution is running stop it and set step to 0
+					stopEvolution();
+				}
+				evolutionCurrentStep = 0;
 				play();
 			}
 			
@@ -304,13 +340,20 @@
 				var year = document.getElementById('year').value;
 				document.getElementById('month').value = get_previous_month(month);
 				document.getElementById('year').value = get_previous_year(year,month);
+				displayFlashNextMonth();
+				setHash();
+				if (evolutionTimer !== undefined) {
+					// If evolution is running stop it and set step to 0
+					stopEvolution();
+				}
+				evolutionCurrentStep = 0;
 				play();
 			}
 
 			function setComplexity(){
 				var value = document.getElementById('complexity').value;
 				soundscape_compleixty = value;
-				setHash()
+				setHash();
 			}
 
 			function setVolume(){
@@ -318,6 +361,21 @@
 				am.setMainVolume(value);
 			}
 
+			function setAutoAdvance(){
+				var autoAdvance = document.getElementById('auto_advance').checked;
+				var isRunning = evolutionTimer !== undefined;
+				if (!autoAdvance){
+					if (isRunning){
+						stopEvolution();
+					}
+				} else {
+					if (currentlyPlayedSounds.length > 0){
+						// If sounds are being played, start evolution now
+						startEvolution();
+					}
+				}
+				setHash();
+			}
 
 			// Search and interaction with Freesound
 
@@ -344,7 +402,7 @@
 				}
 			}
 
-			function search(onSuccess){
+			function search(month, year, onSuccess, onFailure){
 
 				var q = "";
 				var p = 1;
@@ -352,8 +410,6 @@
 				var s = "rating_desc"; // Default is by ratings
 				if (document.getElementById('alternative').checked){ s = "downloads_desc"; }
 
-				var month = document.getElementById('month').value;
-				var year = document.getElementById('year').value;
 				var next_month = get_next_month(month);
 				var next_year = get_next_year(year, month);
 				var f = "created:[" + year + "-" + month + "-1T00:00:00Z TO " + next_year + "-" + next_month + "-01T00:00:00Z] duration:[0.0 TO 60]";
@@ -361,43 +417,17 @@
 				freesound.textSearch(q, {page:p, filter:f, sort:s, fields:fields, page_size:query_page_size},
 		            function(data){
 		            	// Process successful response
+		            	document.getElementById("respSearch").innerHTML = "Loading sounds... will begin playing at any moment...";
 		            	onSuccess(data);
 		            },function(){ 
 		            	// Process error response
 		            	document.getElementById("respSearch").innerHTML = "Error while searching..."; 
-		            }
-		        );
-				document.getElementById("respSearch").innerHTML = "";
-				document.getElementById("respSearch").innerHTML = "Waiting for results...";
-			}
-
-			function search_next(onSuccess, onFailure){
-
-				var q = "";
-				var p = 1;
-				var fields = "id,name,previews,username,license,url"
-				var s = "rating_desc"; // Default is by ratings
-				if (document.getElementById('alternative').checked){ s = "downloads_desc"; }
-
-				var month = document.getElementById('month').value;
-				var year = document.getElementById('year').value;
-				var next_month = get_next_month(month);
-				var next_year = get_next_year(year, month);
-				var next_next_year = get_next_year(next_year, next_month)
-				var next_next_month = get_next_month(next_month);
-				var f = "created:[" + next_year + "-" + next_month + "-1T00:00:00Z TO " + next_next_year + "-" + next_next_month + "-01T00:00:00Z] duration:[0.0 TO 60]";
-							
-				freesound.textSearch(q, {page:p, filter:f, sort:s, fields:fields, page_size:query_page_size},
-		            function(data){
-		            	// Process successful response
-		            	onSuccess(data);
-		            },function(){ 
-		            	// Process error response
 		            	if (onFailure !== undefined){
 		            		onFailure();	
 		            	}
 		            }
 		        );
+				document.getElementById("respSearch").innerHTML = "Waiting for results...";
 			}
 
 			function step() {
@@ -405,14 +435,13 @@
 				var month = document.getElementById('month').value;
 				var year = document.getElementById('year').value;
 				var monthProgress = 100 * (evolutionCurrentStep + 1) / evolutionResolution;
-				displayEvolutionProgress(Math.floor(monthProgress));
-				//console.log('Processing step ' + evolutionCurrentStep + ' of ' + month + '/' + year + ' (' + monthProgress + ')');
 
+				displayEvolutionProgress();
 				setHash(); // Update hash in URL
 
 				// Update currentlyPlayedSounds by adding some from incomingSounds
 				if (evolutionCurrentStep > 0){
-					if (incomingSounds.length > 0){ // If there are still sounds to be added
+					if ((currentlyPlayedSounds.length > 0) && (incomingSounds.length > 0)){ // If there are still sounds to be added
 						
 						var soundsShouldHaveBeenAdded = Math.floor(monthProgress / 100 * incomingSoundsCopy.length);
 						var soundsHaveBeenAdded = incomingSoundsCopy.length - incomingSounds.length;
@@ -426,6 +455,8 @@
 						}
 
 						if (nSoundsToAdd > 0){
+							console.log('Moved ' + nSoundsToAdd + ' sounds from incoming to current');
+							/*
 							var ids = []
 							for (var i=0; i<currentlyPlayedSounds.length; i++){
 								ids.push(currentlyPlayedSounds[i].id);
@@ -437,13 +468,14 @@
 								ids.push(incomingSounds[i].id);
 							}
 							console.log('incomingSounds: ', ids.join(','));
+							*/
 						}
 					}
 				}
 
 				// TODO: update audio players, etc.
 
-				if (evolutionCurrentStep === (evolutionResolution - 1)){  // Last step
+				if (evolutionCurrentStep >= (evolutionResolution - 1)){  // Last step
 					// Advance 1 month
 					var next_month = get_next_month(month);
 					var next_year = get_next_year(year, month);
@@ -457,7 +489,11 @@
 					incomingSoundsCopy = [];
 
 					// Search new sounds and store in incoming
-					search_next(function(data){
+					var month = document.getElementById('month').value;
+					var year = document.getElementById('year').value;
+					var next_month = get_next_month(month);
+					var next_year = get_next_year(year, month);
+					search(next_month, next_year, function(data){
 						sounds = data.results;
 						shuffleArray(sounds);
 						incomingSounds = sounds;
@@ -483,7 +519,7 @@
 			function stopEvolution(){
 				clearTimeout(evolutionTimer);
 				evolutionTimer = undefined;
-				displayEvolutionProgress(0); // Will hide it as timer is undefined
+				displayEvolutionProgress(); // Will hide it as timer is undefined
 			}
 
 		</script>
@@ -491,18 +527,19 @@
 		<h1 style="text-align: center">free<span class="red_text">sound</span> timeline</h1>
 		<div style="text-align:center;">
 			<p>
-				enter month (1-12): <input type="text" id="month" value="8" size=2 maxlength=2>
+				enter month (1-12): <input type="text" id="month" value="8" size=2 maxlength=2 onchange="setHash()">
 				<br>
-				enter year (2005-now): <input type="text" id="year" value="2011" size=4 maxlength=4>
+				enter year (2005-now): <input type="text" id="year" value="2011" size=4 maxlength=4 onchange="setHash()">
 				<br>
 				<span class="slider_label">density:</span> <input id="complexity" type="range" min=0.05 max=1.0 step='.05' value=1.0 oninput="setComplexity()" onchange="setComplexity()">
 				<br>
-				use alternative popularity measure: <input type="checkbox" id="alternative">
+				use alternative popularity measure: <input type="checkbox" id="alternative" onchange="setHash();">
 			</p>
 			
 			<div>
 				<button id="search" onclick="play()">play!</button>
 				<div id="evolution_percentage_indicator"><div id="evolution_percentage_indicator_loader"></div></div>
+				auto advance: <input type="checkbox" onchange="setAutoAdvance();" id="auto_advance">
 				<br>
 				<button onclick="previous()"><<</button>
 				<button onclick="next()">>></button>

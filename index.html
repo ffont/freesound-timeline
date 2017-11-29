@@ -96,8 +96,6 @@
 				document.getElementById('year').value = randomYear;
 				document.getElementById('month').value = randomMonth;
 
-
-
 				parseHashAndSetParams();
 			};
 
@@ -174,11 +172,8 @@
                 }
 
                 // 2) remove sounds from am which are not in currentlyPlayedSounds
-                var currentlyPlayedSoundsURLs = [];  // Get currently played sound URLs (useful later)
-				for (i in currentlyPlayedSounds){
-					var url = currentlyPlayedSounds[i].previews['preview-hq-mp3']; // ogg seems to fail on safari...
-					currentlyPlayedSoundsURLs.push(url);
-				}
+                var currentlyPlayedSoundsURLs = currentlyPlayedSounds.map(x => x.previews['preview-hq-mp3']);  // Get currently played sound URLs (useful later)
+				
 				for (i in currentBufferNodes){
 					var name = currentBufferNodes[i];
 					if (currentlyPlayedSoundsURLs.indexOf(name) === -1){
@@ -483,6 +478,49 @@
 				setHash();
 			}
 
+			function setPopularityMeasure(){
+				// The popularity measure is used when new sounds are searched in Freesound.
+				// However, if we are in "auto advance" mode and there are incoming sounds, we can
+				// do a search and replace the sounds in incoming with new sounds retrieved with the
+				// the newly set popularity measure
+
+				if (incomingSounds) {
+					var month = document.getElementById('month').value;
+					var year = document.getElementById('year').value;
+					var next_month = getNextMonth(month);
+					var next_year = getNextYear(year, month);
+			        search(next_month, next_year, function(data){
+			        	if (data.results.length === 0) {
+		            		document.getElementById("respSearch").innerHTML = "No results...";
+		            	} else {
+			            	// Chose new sounds to replace incoming sounds
+			            	sounds = data.results;
+							shuffleArray(sounds);
+							var newlyChosenSounds = sounds.slice(0, incomingSounds.length);
+
+							// Update incomingSoundsCopy with the new sounds
+							// Iterate over existing incomingSoundsCopy and remove those that have not yet been added to currentlyPlayedSounds
+							var newIncomingSoundsCopy = [];
+							var currentlyPlayedSoundsURLs = currentlyPlayedSounds.map(x => x.url);
+			            	for (i in incomingSoundsCopy){
+			            		var incomingSound = incomingSoundsCopy[i];
+			            		if (currentlyPlayedSoundsURLs.indexOf(incomingSound.url) > -1){
+			            			newIncomingSoundsCopy.push(incomingSound);
+			            		}
+			            	}
+			            	// Now add the newly retrieved sounds
+			            	newIncomingSoundsCopy = newIncomingSoundsCopy.concat(newlyChosenSounds);
+			            	incomingSoundsCopy = newIncomingSoundsCopy;
+
+			            	// Update incoming sounds
+			            	incomingSounds = newlyChosenSounds;
+			            }
+			        });
+				}
+
+				setHash();  // Update hash
+			}
+
 			function panic(){
 				if (evolutionTimer !== undefined){
 					stopEvolution();
@@ -617,7 +655,7 @@
 				<br>
 				<span class="slider_label">density:</span> <input id="complexity" type="range" min=0.05 max=1.0 step='.05' value=1.0 oninput="setComplexity()" onchange="setComplexity()">
 				<br>
-				use alternative popularity measure: <input type="checkbox" id="alternative" onchange="setHash();">
+				use alternative popularity measure: <input type="checkbox" id="alternative" onchange="setPopularityMeasure()">
 			</p>
 			
 			<div>

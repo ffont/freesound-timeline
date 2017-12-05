@@ -232,6 +232,19 @@
 				document.getElementById("respSearch").innerHTML = "";
 			}
 
+			function softStopAllSounds() {
+				// Stop all playing audio buffers (if am was ever initialized only)
+				am.stopAllBufferNodes(disableOnEnded=true, hardStop=false, removeBuffers=true);	
+				
+				// Clear all existing timeouts
+				for (var i =0;i<play_timers.length;i++){  
+					var timer = play_timers[i].timer;
+					clearTimeout(timer);
+				}
+				play_timers = [];
+
+			}
+
 
 			// Util functions
 
@@ -602,6 +615,29 @@
 					document.getElementById('month').value = next_month;
 					document.getElementById('year').value = next_year;
 					displayFlashNextMonth();
+
+					// Check if we are in the future and should stop
+					var currentRealYear = (new Date()).getFullYear();
+					if (next_year >= currentRealYear){
+						if (next_year > currentRealYear){
+							stopEvolution();
+							displayEvolutionProgress();
+							softStopAllSounds();
+							document.getElementById("respSearch").innerHTML = "No sounds for the future (yet)...";
+							setHash(); // Update hash in URL
+							return 0;
+						} else {
+							// next_year === currentRealYear
+							var currentRealMonth = (new Date()).getMonth();
+							if (next_month > currentRealMonth){
+								stopEvolution();
+								displayEvolutionProgress();
+								softStopAllSounds();
+								document.getElementById("respSearch").innerHTML = "No sounds for the future (yet)...";
+								return 0;
+							}
+						}
+					}
 
 					// Set currentlyPlayedSounds to incomingSoundsCopy (just in case it had not been fully updated after all the steps)
 					currentlyPlayedSounds = incomingSoundsCopy;

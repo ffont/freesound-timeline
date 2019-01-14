@@ -62,6 +62,7 @@
 
 			// Global variables and init
 
+			var full_attribution_list = [];
 			var soundscape_compleixty = 0.4;
 			var soundscape_complexity_interval = 3000;
 			var query_page_size = 15;
@@ -196,6 +197,10 @@
                     var label = '<a href="' + snd.url + '" target="_blank">' + snd.name + '</a> by <b>' + snd.username + '</b>';
                     document.getElementById('attributionList').innerHTML += 
                     	label + ' | <a href="' + snd.license + '" target="_blank">' + getLicenseName(snd.license) + '</a><br>'
+
+					if (full_attribution_list.indexOf(label) === -1){
+						full_attribution_list.push(label)
+					}
                 }
                 
 			}

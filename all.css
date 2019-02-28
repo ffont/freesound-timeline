@@ -1,5 +1,6 @@
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Helvetica', sans-serif;
+    font-weight: 200;
     color:#000;
     background: url("background.png");
     background-repeat: no-repeat;
@@ -12,10 +13,11 @@ body {
   }
 }
 
-h1 {font-family: Helvetiva, Arial; font-size:30px;}
-a {color: #000; text-decoration: underline;}
-a:visited {color: #000;}
-a:hover {color: #777; text-decoration: underline;}
+a {
+    color: #000; 
+    text-decoration: underline;
+    font-weight: 300;
+}
 
 #wrapper {
     padding: 40px;
@@ -44,6 +46,35 @@ a:hover {color: #777; text-decoration: underline;}
     padding-top: 80px;
 }
 
+#about {
+    text-transform: uppercase;
+    font-size: 10px;
+    line-height: 20px;
+    padding-top: 20px;
+}
+
+#attributionList {
+    font-size: 14px;
+    line-height: 40px;
+    padding-top: 40px;
+    padding-bottom: 40px;
+    max-height: 300px;
+    overflow: scroll;
+}
+
+.username {
+    text-transform: uppercase;
+}
+
+.soundname {
+    font-size: 18px;
+    text-transform: uppercase;
+}
+
+.licensename {
+    text-transform: uppercase;
+}
+
 
 input { padding: 5px; border-radius: 4px; border: 1px #ddd solid; font-size: 12px; margin-bottom: 3px;}
 button { 
@@ -62,7 +93,6 @@ button {
 button:hover {background-color: #f76576; }
 .black_button {background-color: #333; }
 .black_button:hover {background-color: #888; }
-.gray_text {color:#888; }
 
 #evolution_percentage_indicator {
     display: none; /* must be set to inline-block in code  */

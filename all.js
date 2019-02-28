@@ -129,12 +129,12 @@ function playCurrentSounds() {
     }
 
     // 3) Update attribution list accordingly
-    document.getElementById('attributionList').innerHTML = '<span class="gray_text">Sounds used:</span> <br><br>';
+    document.getElementById('attributionList').innerHTML = '';
     for (i in currentlyPlayedSounds) {
         var snd = currentlyPlayedSounds[i];
-        var label = '<a href="' + snd.url + '" target="_blank">' + snd.name + '</a> by <b>' + snd.username + '</b>';
+        var label = '<a href="' + snd.url + '" target="_blank" class="soundname">' + snd.name + '</a> by <span class="username">' + snd.username + '</span>';
         document.getElementById('attributionList').innerHTML +=
-            label + ' | <a href="' + snd.license + '" target="_blank">' + getLicenseName(snd.license) + '</a><br>'
+            label + '<br>'// + ' | <a href="' + snd.license + '" target="_blank" class="licensename">' + getLicenseName(snd.license) + '</a><br>'
 
         if (full_attribution_list.indexOf(label) === -1) {
             full_attribution_list.push(label)

@@ -16,60 +16,61 @@
 			<div id="share">Share</div>
 			<br style="clear: both;">
 			<div id="content">
-				<div style="text-align:center;">
 
-					<div>
-						<button id="search" onclick="play()">play!</button>
-						<div id="evolution_percentage_indicator">
-							<div id="evolution_percentage_indicator_loader"></div>
-						</div>
-						
-						<br>
-						<button onclick="previous()">
-							<<</button> <button onclick="next()">>>
-						</button>
+				<div>
+					<button id="search" onclick="play()">play!</button>
+					<div id="evolution_percentage_indicator">
+						<div id="evolution_percentage_indicator_loader"></div>
 					</div>
+					
+					<br>
+					<button onclick="previous()">
+						<<</button> <button onclick="next()">>>
+					</button>
+				</div>
 
-					<p>
-						enter month (1-12): <input type="text" id="month" value="3" size=2 maxlength=2 onchange="setHash()">
-						<br>
-						enter year (2005-now): <input type="text" id="year" value="2005" size=4 maxlength=4 onchange="setHash()">
-						<br>
-						<span class="slider_label">density:</span> <input id="complexity" type="range" min=0.05 max=1.0 step='.05'
-							value=1.0 oninput="setComplexity()" onchange="setComplexity()">
-						<br>
-						use alternative popularity measure: <input type="checkbox" id="alternative" onchange="setPopularityMeasure()">
-						<br>
-						auto advance: <input type="checkbox" checked onchange="setAutoAdvance();" id="auto_advance">
-					</p>
+				<p>
+					enter month (1-12): <input type="text" id="month" value="3" size=2 maxlength=2 onchange="setHash()">
+					<br>
+					enter year (2005-now): <input type="text" id="year" value="2005" size=4 maxlength=4 onchange="setHash()">
+					<br>
+					<span class="slider_label">density:</span> <input id="complexity" type="range" min=0.05 max=1.0 step='.05'
+						value=1.0 oninput="setComplexity()" onchange="setComplexity()">
+					<br>
+					use alternative popularity measure: <input type="checkbox" id="alternative" onchange="setPopularityMeasure()">
+					<br>
+					auto advance: <input type="checkbox" checked onchange="setAutoAdvance();" id="auto_advance">
+				</p>
 
-					<br>
-					<div>
-						<span id="respSearch">please <b>use headphones</b> for the full experience</span>
-						<div id="volumeDisplay" style="display:none;"><span class="slider_label">volume:</span> <input id="volume"
-								type="range" min=0.0 max=1.0 step='.05' value=1.0 oninput="setVolume()" onchange="setVolume()"></div>
-					</div>
-					<br>
-					<div id="panic1" style="display:none"><button id="stopAllSounds" class="black_button"
-							onclick="panic()">panic!</button></div>
-					<div id="panic2">no need for panic button... yet!</div>
-					<br>
-					<div id="attributionList"></div>
-					<br>
-					<br>
-					<div style="display:inline-block;" class="gray_text">
-						This is a very simple hack that gets the most popular sounds in <a href="https://freesound.org"
-							target="_blank">Freesound</a> for a given
-						year and month and plays them all at once (in loop). Use the density slider to adjust the complexity of the
-						generated soundscape. Copy the URL to share the soundscape with your friends. <br><b>EDIT</b>: added a new
-						killer feature which allows you to automatically advance in time and explore Freesound history in a sort of
-						"radio" mode. Just check the "auto-advance" checkbox and enjoy.
-				
-						<br><br>This hack was originally implemented in 2011 when I was starting to learn about web technologies. It has
-						been recently updated to use Freesound APIv2, the Web Audio API (including random HRTF panning for each sound!)
-						and to include some other nice improvements. Want to contribute? visit the <a
-							href="http://github.com/ffont/freesound-timeline" target="_blank">code repository</a>.
-					</div>
+				<br>
+				<div>
+					<span id="respSearch">please <b>use headphones</b> for the full experience</span>
+					<div id="volumeDisplay" style="display:none;"><span class="slider_label">volume:</span> <input id="volume"
+							type="range" min=0.0 max=1.0 step='.05' value=1.0 oninput="setVolume()" onchange="setVolume()"></div>
+				</div>
+				<br>
+				<div id="panic1" style="display:none"><button id="stopAllSounds" class="black_button"
+						onclick="panic()">panic!</button></div>
+				<div id="panic2">no need for panic button... yet!</div>
+				<br>
+				<div id="attributionList"></div>
+				<br>
+				<br>
+				<div id="about">
+					Freesound Timeline is a hack that I originally implemented in 2011 when I was starting to learn about web technologies. 
+					In 2018 I updated it to make use Freesound APIv2 and the Web Audio API, and to add new killer features such as random 
+					spacialization of sounds in a 3D space (using WebAudio's HRTF panning), and the <i>autoadvance</i> mode to let Freesound Timeline
+					automatically advance through Freesound history. Want to contribute? <a
+					href="http://github.com/ffont/freesound-timeline" target="_blank">visit the code repository</a>.
+
+					<!--
+					This is a very simple hack that gets the most popular sounds in <a href="https://freesound.org"
+					target="_blank">Freesound</a> for a given
+					year and month and plays them all at once (in loop). Use the density slider to adjust the complexity of the
+					generated soundscape. Copy the URL to share the soundscape with your friends. <br><b>EDIT</b>: added a new
+					killer feature which allows you to automatically advance in time and explore Freesound history in a sort of
+					"radio" mode. Just check the "auto-advance" checkbox and enjoy.
+					-->
 				</div>
 			</div>
 		</div>

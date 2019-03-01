@@ -3,17 +3,21 @@ input[type=range] {
     -webkit-appearance: none;
     
     /*fix for FF unable to apply focus style bug */
-    border: 1px solid white;
+    border: 0px solid transparent;
     
     /*required for proper track sizing in FF*/
     width: 150px;
+
+    background: transparent;
+
+    padding: 7px;
 }
 input[type=range]::-webkit-slider-runnable-track {
     width: 150px;
-    height: 5px;
-    background: #ddd;
+    height: 1px;
+    background: black;
     border: none;
-    border-radius: 3px;
+    border-radius: 0px;
 }
 input[type=range]::-webkit-slider-thumb {
     -webkit-appearance: none;
@@ -21,57 +25,56 @@ input[type=range]::-webkit-slider-thumb {
     height: 16px;
     width: 16px;
     border-radius: 50%;
-    background: #888;
-    margin-top: -4px;
+    background: black;
+    margin-top: -7px;
 }
+
 input[type=range]:focus {
     outline: none;
-}
-input[type=range]:focus::-webkit-slider-runnable-track {
-    background: #ccc;
 }
 
 input[type=range]::-moz-range-track {
     width: 150px;
-    height: 5px;
-    background: #ddd;
+    height: 1px;
+    background: black;
     border: none;
-    border-radius: 3px;
+    border-radius: 0px;
+    padding: 0px;
 }
 input[type=range]::-moz-range-thumb {
     border: none;
     height: 16px;
     width: 16px;
     border-radius: 50%;
-    background: #888;
+    background: black;
 }
 
 /*hide the outline behind the border*/
 input[type=range]:-moz-focusring{
-    outline: 1px solid white;
+    outline: 0px solid transparent;
     outline-offset: -1px;
 }
 
 input[type=range]::-ms-track {
     width: 150px;
-    height: 5px;
+    height: 1px;
     
     /*remove bg colour from the track, we'll use ms-fill-lower and ms-fill-upper instead */
-    background: transparent;
+    background: black;
     
     /*leave room for the larger thumb to overflow with a transparent border */
     border-color: transparent;
-    border-width: 6px 0;
+    border-width: 0px 0;
 
     /*remove default tick marks*/
     color: transparent;
 }
 input[type=range]::-ms-fill-lower {
-    background: #777;
+    background: transparent;
     border-radius: 10px;
 }
 input[type=range]::-ms-fill-upper {
-    background: #ddd;
+    background: transparent;
     border-radius: 10px;
 }
 input[type=range]::-ms-thumb {
@@ -79,11 +82,11 @@ input[type=range]::-ms-thumb {
     height: 16px;
     width: 16px;
     border-radius: 50%;
-    background: #888;
+    background: black;
 }
 input[type=range]:focus::-ms-fill-lower {
-    background: #888;
+    background: transparent;
 }
 input[type=range]:focus::-ms-fill-upper {
-    background: #ccc;
+    background: transparent;
 }

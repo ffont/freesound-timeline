@@ -43,6 +43,14 @@ window.onload = function () {
     document.getElementById('month').value = randomMonth;
 
     parseHashAndSetParams();
+    
+    var elems = document.getElementsByClassName('input_focus_enter');
+    for (var i = 0; i < elems.length; i++) {
+        elems[i].addEventListener('keyup', function (e) {
+            if (e.which == 13) this.blur();
+        });
+    }
+    
 };
 
 function initSoundArrays() {
@@ -66,16 +74,33 @@ function lazyInitAudioManager() {
     }
 }
 
+function showPlayingIndicator(elementID) {
+    var playing_indicator_element = document.getElementById(elementID);
+    if (playing_indicator_element !== null) {
+        playing_indicator_element.innerHTML = '<img class="playing-indicator-img" src="speaker.png" />';
+    }
+}
+
+function hidePlayingIndicator(elementID) {
+    var playing_indicator_element = document.getElementById(elementID);
+    if (playing_indicator_element !== null) {
+        playing_indicator_element.innerHTML = '';
+    }
+}
+
 function playSound(name, url) {
 
     // Only play sound if a random number is above a specific probability, otherwise try
     // again after some time.
     if (100.0 * Math.random() >= (100.0 - soundscape_compleixty)) {
         clearPlayTimersForSound(url); // Remove existing play timer for this sound (if any)
-        //document.getElementById("respSearch").innerHTML = "Playing: " + name;
+        document.getElementById("nowPlaying").innerHTML = 'Now Playing: ' +  name;
+        var element_playing_indicator_id = 'play_placeholder_' + url;
+        showPlayingIndicator(element_playing_indicator_id);
         am.playSoundFromURL(url, 0, {
             panHRTF: { x: randomBetween(-1.0, 1.0), y: randomBetween(-2.0, 2.0), z: randomBetween(-2.0, 2.0) },
             onended: function (event) {
+                hidePlayingIndicator(element_playing_indicator_id);
                 playSound(name, url);  // On end, play again the sound
                 // NOTE: we don't use Web Audio API loop prop here as it does not trigger onended event
             }
@@ -104,7 +129,7 @@ function playCurrentSounds() {
         var url = snd.previews['preview-hq-mp3']; // ogg seems to fail on safari...
         if (currentBufferNodes.indexOf(url) === -1) {
             // If sound not present in buffer, start to play it
-            var label = '<a href="' + snd.url + '" target="_blank">' + snd.name + '</a> by <b>' + snd.username + '</b>';
+            var label = snd.name + ' by ' + snd.username;
             playSound(label, url);
             //console.log('Adding sound to play ', url);
             nAddedToPlay += 1;
@@ -132,7 +157,7 @@ function playCurrentSounds() {
     document.getElementById('attributionList').innerHTML = '';
     for (i in currentlyPlayedSounds) {
         var snd = currentlyPlayedSounds[i];
-        var label = '<a href="' + snd.url + '" target="_blank" class="soundname">' + snd.name + '</a> by <span class="username">' + snd.username + '</span>';
+        var label = '<a href="' + snd.url + '" target="_blank" class="soundname">' + snd.name + '</a> by <span class="username">' + snd.username + '</span><span class="play_placeholder" id="play_placeholder_' + snd.previews['preview-hq-mp3'] + '"></span>';
         document.getElementById('attributionList').innerHTML +=
             label + '<br>'// + ' | <a href="' + snd.license + '" target="_blank" class="licensename">' + getLicenseName(snd.license) + '</a><br>'
 
@@ -171,6 +196,12 @@ function stopAllSounds() {
     // Update UI
     document.getElementById("stop_button").style.display = 'none';
     document.getElementById("play_button").style.display = 'inline-block';
+    document.getElementById("nowPlaying").innerHTML = '';
+    
+    var elems = document.getElementsByClassName("play_placeholder");
+    for (var i = 0; i < elems.length; i++) {
+        elems[i].innerHTML = "";
+    }
     //document.getElementById("respSearch").innerHTML = "";
 }
 
@@ -347,7 +378,7 @@ function play() {
     stopAllSounds();
     initSoundArrays();
     setHash();
-
+    
     // Get sounds for current month
     var month = document.getElementById('month').value;
     var year = document.getElementById('year').value;

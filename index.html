@@ -30,20 +30,22 @@
 						<div id="evolution_percentage_indicator_loader"></div>
 					</div>
 					<button onclick="next()"><img class="button-img" src="next_button.png" /></button>
+
+					<div id="nowPlaying"></div>
 				</div>
 
 				<div class="controls">
 					<div class="control">
 						<label for="year">Year</label>
-						<input type="text" name="year" id="year" min="2005" max="9999" step="1" maxlength="4" onkeypress='return event.charCode >= 48 && event.charCode <= 57' onchange="setHash()">
+						<input class="input_focus_enter" type="text" name="year" id="year" min="2005" max="9999" step="1" maxlength="4" onkeypress='return event.charCode >= 48 && event.charCode <= 57' onchange="setHash()">
 					</div>
 					<div class="control">
 						<label for="month">Month</label>
-						<input type="text" name="month" id="month" min="1" max="12" step="1" maxlength="2" onkeypress='return event.charCode >= 48 && event.charCode <= 57' onchange="setHash()">
+						<input class="input_focus_enter" type="text" name="month" id="month" min="1" max="12" step="1" maxlength="2" onkeypress='return event.charCode >= 48 && event.charCode <= 57' onchange="setHash()">
 					</div>
 					<div class="control">
 						<label for="complexity">Density</label>
-						<input type="text" name="complexity" id="complexity" min="1" step="1" max="100" maxlength="3" onkeypress='return event.charCode >= 48 && event.charCode <= 57' onchange="setComplexity()">
+						<input class="input_focus_enter" type="text" name="complexity" id="complexity" min="1" step="1" max="100" maxlength="3" onkeypress='return event.charCode >= 48 && event.charCode <= 57' onchange="setComplexity()">
 					</div>
 					<div class="control">
 						<label for="alternative">Alternate</label>
@@ -60,7 +62,7 @@
 					please <b>use headphones</b> for the full experience
 				</div>
 				<div id="about">
-					Freesound Timeline is a hack that I originally implemented in 2011 when I was starting to learn about web technologies. 
+					Freesound Timeline is a app that I originally implemented in 2011 when I was starting to learn about web technologies. 
 					In 2018 I updated it to make use <a href="https://freesound.org" target="_blank">Freesound</a> APIv2 and the Web Audio API, and to add new killer features such as random 
 					spacialization of sounds in a 3D space (using WebAudio's HRTF panning), and the <i>autoadvance</i> mode to let Freesound Timeline
 					automatically advance through Freesound history. Want to contribute? <a

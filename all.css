@@ -12,9 +12,18 @@ body {
     background-size: auto 200%;
   }
 }
-@media screen and (max-width: 800px) {
+@media screen and (max-width: 900px) {
   #volume_control {
       display: none;
+  }
+
+  .control {
+      display: block!important;
+      margin-bottom: 30px!important;
+  }
+
+  #evolution_percentage_indicator {
+      width: 60%!important;
   }
 }
 
@@ -59,11 +68,18 @@ a {
     line-height: 22px;
 }
 
+#nowPlaying{
+    text-transform: uppercase;
+    margin-top: 4px;
+    height: 20px;
+    display: none; /* hide for now */
+}
+
 #attributionList {
     font-size: 14px;
-    line-height: 40px;
-    max-height: 300px;
-    overflow: scroll;
+    line-height: 38px;
+    /*max-height: 300px;
+    overflow: scroll;*/
     text-transform: uppercase;
     margin-top: 50px;
     margin-bottom: 40px;
@@ -109,6 +125,7 @@ input[type=checkbox] {
     width: 100%;
     cursor: pointer;
     text-transform: uppercase;
+    line-height: 50px;
 }
 
 label {
@@ -123,7 +140,7 @@ label {
 }
 
 .controls {
-    margin-top: 42px;
+    margin-top: 35px;
 }
 
 button { 
@@ -143,6 +160,13 @@ button {
     width: 20px;
     vertical-align: bottom;
     padding-bottom: 2px;
+}
+
+.playing-indicator-img {
+    height: 20px;
+    width: 20px;
+    vertical-align: middle;
+    padding-left: 8px;
 }
 
 #stop_button {

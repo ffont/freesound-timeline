@@ -1,7 +1,7 @@
 // Global variables and init
 
 var full_attribution_list = [];
-var soundscape_compleixty = 0.4;
+var soundscape_compleixty = 40;
 var soundscape_complexity_interval = 3000;
 var query_page_size = 15;
 var play_timers = [];
@@ -32,6 +32,12 @@ window.onload = function () {
         if (randomMonth >= (new Date()).getMonth()) {
             randomMonth = (new Date()).getMonth() - 1;
         }
+    }
+    if (randomMonth === 0){
+        randomMonth = 1;
+    }
+    if (randomMonth > 12) {
+        randomMonth = 12;
     }
     document.getElementById('year').value = randomYear;
     document.getElementById('month').value = randomMonth;
@@ -64,9 +70,9 @@ function playSound(name, url) {
 
     // Only play sound if a random number is above a specific probability, otherwise try
     // again after some time.
-    if (Math.random() >= (1.0 - soundscape_compleixty)) {
+    if (100.0 * Math.random() >= (100.0 - soundscape_compleixty)) {
         clearPlayTimersForSound(url); // Remove existing play timer for this sound (if any)
-        document.getElementById("respSearch").innerHTML = "Playing: " + name;
+        //document.getElementById("respSearch").innerHTML = "Playing: " + name;
         am.playSoundFromURL(url, 0, {
             panHRTF: { x: randomBetween(-1.0, 1.0), y: randomBetween(-2.0, 2.0), z: randomBetween(-2.0, 2.0) },
             onended: function (event) {
@@ -74,12 +80,6 @@ function playSound(name, url) {
                 // NOTE: we don't use Web Audio API loop prop here as it does not trigger onended event
             }
         });
-        if (document.getElementById("panic2").offsetParent !== null) {
-            document.getElementById("panic2").style.display = 'none';
-            document.getElementById("panic1").style.display = 'block';
-            document.getElementById("volumeDisplay").style.display = 'block';
-        }
-
     } else {
         var play_timer = setTimeout(function () {
             playSound(name, url);
@@ -169,10 +169,9 @@ function stopAllSounds() {
     play_timers = [];
 
     // Update UI
-    document.getElementById("panic1").style.display = 'none';
-    document.getElementById("panic2").style.display = 'block';
-    document.getElementById("volumeDisplay").style.display = 'none';
-    document.getElementById("respSearch").innerHTML = "";
+    document.getElementById("stop_button").style.display = 'none';
+    document.getElementById("play_button").style.display = 'inline-block';
+    //document.getElementById("respSearch").innerHTML = "";
 }
 
 function softStopAllSounds() {
@@ -228,6 +227,10 @@ function parseHashAndSetParams() {
     }
     if (alternative == 'true') {
         document.getElementById("alternative").checked = true;
+        document.getElementById('alternate_label').innerHTML = 'on';
+    } else if (alternative == 'false') {
+        document.getElementById("alternative").checked = false;
+        document.getElementById('alternate_label').innerHTML = 'off';;
     }
     if (complexity) {
         soundscape_compleixty = complexity;
@@ -240,11 +243,15 @@ function parseHashAndSetParams() {
         }
         evolutionCurrentStep = newEvolutionCurrentStep;  // Set current evolution step
     }
+
+    displayEvolutionProgress();
     if (auto_advance == 'true') {
         document.getElementById("auto_advance").checked = true;
-        displayEvolutionProgress();
-    } else {
+        document.getElementById('autoadvance_label').innerHTML = 'on';
+    } else if (auto_advance == 'false') {
         hideEvolutionProgress();
+        document.getElementById("auto_advance").checked = false;
+        document.getElementById('autoadvance_label').innerHTML = 'off';
     }
 }
 
@@ -335,7 +342,7 @@ function displayFlashNextMonth() {
 // Button interactions
 
 function play() {
-    document.getElementById('attributionList').innerHTML = '';
+    //document.getElementById('attributionList').innerHTML = '';
     lazyInitAudioManager(); // Init audio context here in response to user action
     stopAllSounds();
     initSoundArrays();
@@ -347,9 +354,12 @@ function play() {
     search(month, year, function (data) {
         sounds = data.results;
         if (data.results.length === 0) {
-            document.getElementById("respSearch").innerHTML = "No results...";
+            document.getElementById("attributionList").innerHTML = "No results...";
         } else {
-            document.getElementById("respSearch").innerHTML = "Loading sounds... will begin playing at any moment...";
+            document.getElementById("play_button").style.display = 'none';
+            document.getElementById("stop_button").style.display = 'inline-block';
+
+            document.getElementById("attributionList").innerHTML = "Loading sounds... will begin playing at any moment...";
             shuffleArray(sounds);
             currentlyPlayedSounds = sounds;
             playCurrentSounds();
@@ -364,7 +374,7 @@ function play() {
     var next_year = getNextYear(year, month);
     search(next_month, next_year, function (data) {
         if (data.results.length === 0) {
-            document.getElementById("respSearch").innerHTML = "No results...";
+            document.getElementById("attributionList").innerHTML = "No results...";
         } else {
             sounds = data.results;
             shuffleArray(sounds);
@@ -441,14 +451,14 @@ function setPopularityMeasure() {
     // do a search and replace the sounds in incoming with new sounds retrieved with the
     // the newly set popularity measure
 
-    if (incomingSounds) {
+    if (incomingSounds.length > 0) {
         var month = document.getElementById('month').value;
         var year = document.getElementById('year').value;
         var next_month = getNextMonth(month);
         var next_year = getNextYear(year, month);
         search(next_month, next_year, function (data) {
             if (data.results.length === 0) {
-                document.getElementById("respSearch").innerHTML = "No results...";
+                document.getElementById("attributionList").innerHTML = "No results...";
             } else {
                 // Chose new sounds to replace incoming sounds
                 sounds = data.results;
@@ -506,13 +516,13 @@ function search(month, year, onSuccess, onFailure) {
             onSuccess(data);
         }, function () {
             // Process error response
-            document.getElementById("respSearch").innerHTML = "Error while searching...";
+            document.getElementById("attributionList").innerHTML = "Error while searching...";
             if (onFailure !== undefined) {
                 onFailure();
             }
         }
     );
-    document.getElementById("respSearch").innerHTML = "Waiting for results...";
+    document.getElementById("attributionList").innerHTML = "Waiting for results...";
 }
 
 // Evolution
@@ -566,7 +576,7 @@ function step() {
                 stopEvolution();
                 displayEvolutionProgress();
                 softStopAllSounds();
-                document.getElementById("respSearch").innerHTML = "No sounds for the future (yet)...";
+                document.getElementById("attributionList").innerHTML = "No sounds for the future (yet)...";
                 setHash(); // Update hash in URL
                 return 0;
             } else {
@@ -576,7 +586,7 @@ function step() {
                     stopEvolution();
                     displayEvolutionProgress();
                     softStopAllSounds();
-                    document.getElementById("respSearch").innerHTML = "No sounds for the future (yet)...";
+                    document.getElementById("attributionList").innerHTML = "No sounds for the future (yet)...";
                     return 0;
                 }
             }
@@ -622,4 +632,34 @@ function startEvolution() {
 function stopEvolution() {
     clearTimeout(evolutionTimer);
     evolutionTimer = undefined;
+}
+
+function toggleAlternativeCheckbox() {
+    var checkbox = document.getElementById('alternative');
+    var label = document.getElementById('alternate_label');
+    if (checkbox.checked == true){
+        label.innerHTML = 'off';
+        checkbox.checked = false;
+    } else {
+        label.innerHTML = 'on';
+        checkbox.checked = true;
+    }
+    setPopularityMeasure();
+}
+
+function toggleAutoAdvanceCheckbox() {
+    var checkbox = document.getElementById('auto_advance');
+    var label = document.getElementById('autoadvance_label');
+    if (checkbox.checked == true) {
+        label.innerHTML = 'off';
+        checkbox.checked = false;
+    } else {
+        label.innerHTML = 'on';
+        checkbox.checked = true;
+    }
+    setAutoAdvance();
+}
+
+function share(){
+    alert('Share by copying this URL:\n' + location.href);
 }

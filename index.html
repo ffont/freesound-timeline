@@ -12,53 +12,56 @@
 	</head>
 	<body>
 		<div id="wrapper">
-			<div id="title">Freesound Timeline<img src="fs_wave_logo.svg"></div>
-			<div id="share">Share</div>
+			<div id="title">Freesound Timeline<img src="fs_wave_logo.png"></div>
+			<div id="share">
+				<span id="volume_control">
+					<img class="speaker-img" src="speaker.png" /><input id="volume" type="range" min=0.0 max=1.0 step='.05' value=1.0 oninput="setVolume()" onchange="setVolume()">
+				</span>
+				<a href="javascript:void(0);" onclick="share();">Share</a>
+			</div>
 			<br style="clear: both;">
 			<div id="content">
 
-				<div>
-					<button id="search" onclick="play()">play!</button>
+				<div id="transport">
+					<button onclick="previous()"><img class="button-img" src="prev_button.png" /></button>
+					<button id="play_button" onclick="play()"><img class="button-img" src="play_button.png" /></button>
+					<button id="stop_button" onclick="panic()"><img class="button-img" src="stop_button.png" /></button>
 					<div id="evolution_percentage_indicator">
 						<div id="evolution_percentage_indicator_loader"></div>
 					</div>
-					
-					<br>
-					<button onclick="previous()">
-						<<</button> <button onclick="next()">>>
-					</button>
+					<button onclick="next()"><img class="button-img" src="next_button.png" /></button>
 				</div>
 
-				<p>
-					enter month (1-12): <input type="text" id="month" value="3" size=2 maxlength=2 onchange="setHash()">
-					<br>
-					enter year (2005-now): <input type="text" id="year" value="2005" size=4 maxlength=4 onchange="setHash()">
-					<br>
-					<span class="slider_label">density:</span> <input id="complexity" type="range" min=0.05 max=1.0 step='.05'
-						value=1.0 oninput="setComplexity()" onchange="setComplexity()">
-					<br>
-					use alternative popularity measure: <input type="checkbox" id="alternative" onchange="setPopularityMeasure()">
-					<br>
-					auto advance: <input type="checkbox" checked onchange="setAutoAdvance();" id="auto_advance">
-				</p>
-
-				<br>
-				<div>
-					<span id="respSearch">please <b>use headphones</b> for the full experience</span>
-					<div id="volumeDisplay" style="display:none;"><span class="slider_label">volume:</span> <input id="volume"
-							type="range" min=0.0 max=1.0 step='.05' value=1.0 oninput="setVolume()" onchange="setVolume()"></div>
+				<div class="controls">
+					<div class="control">
+						<label for="year">Year</label>
+						<input type="text" name="year" id="year" min="2005" max="9999" step="1" maxlength="4" onkeypress='return event.charCode >= 48 && event.charCode <= 57' onchange="setHash()">
+					</div>
+					<div class="control">
+						<label for="month">Month</label>
+						<input type="text" name="month" id="month" min="1" max="12" step="1" maxlength="2" onkeypress='return event.charCode >= 48 && event.charCode <= 57' onchange="setHash()">
+					</div>
+					<div class="control">
+						<label for="complexity">Density</label>
+						<input type="text" name="complexity" id="complexity" min="1" step="1" max="100" maxlength="3" onkeypress='return event.charCode >= 48 && event.charCode <= 57' onchange="setComplexity()">
+					</div>
+					<div class="control">
+						<label for="alternative">Alternate</label>
+						<span id="alternate_label" class="ckecboxlabel" onclick="toggleAlternativeCheckbox()">OFF</span>
+						<input type="checkbox" name="alternative" id="alternative">
+					</div>
+					<div class="control">
+						<label for="auto_advance">Autoadvance</label>
+						<span id="autoadvance_label" class="ckecboxlabel" onclick="toggleAutoAdvanceCheckbox()">ON</span>
+						<input type="checkbox" name="auto_advance" id="auto_advance" checked>
+					</div>
+				</div>				
+				<div id="attributionList">
+					please <b>use headphones</b> for the full experience
 				</div>
-				<br>
-				<div id="panic1" style="display:none"><button id="stopAllSounds" class="black_button"
-						onclick="panic()">panic!</button></div>
-				<div id="panic2">no need for panic button... yet!</div>
-				<br>
-				<div id="attributionList"></div>
-				<br>
-				<br>
 				<div id="about">
 					Freesound Timeline is a hack that I originally implemented in 2011 when I was starting to learn about web technologies. 
-					In 2018 I updated it to make use Freesound APIv2 and the Web Audio API, and to add new killer features such as random 
+					In 2018 I updated it to make use <a href="https://freesound.org" target="_blank">Freesound</a> APIv2 and the Web Audio API, and to add new killer features such as random 
 					spacialization of sounds in a 3D space (using WebAudio's HRTF panning), and the <i>autoadvance</i> mode to let Freesound Timeline
 					automatically advance through Freesound history. Want to contribute? <a
 					href="http://github.com/ffont/freesound-timeline" target="_blank">visit the code repository</a>.

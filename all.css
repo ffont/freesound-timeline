@@ -4,18 +4,18 @@ body {
     color:#000;
     background: url("background.png");
     background-repeat: repeat;
-    background-size: 100% auto;
+    /*background-size: 100% auto;*/
 }
 
 @media screen and (max-aspect-ratio: 3360/2112) {
   body {
-    background-size: auto 200%;
+    /*background-size: auto 200%;*/
   }
 }
 
 @media screen and (max-aspect-ratio: 570/300) {
   body {
-    background-size: auto 300%;
+    /*background-size: auto 300%;*/
   }
 }
 
@@ -61,8 +61,12 @@ body {
     }
 
     #evolution_percentage_indicator {
-      width: 130px!important;
-   }
+      width: 50px!important;
+    }
+
+    .ckecboxlabel {
+        padding-left: 16px;
+    }
 }
 
 a {
@@ -96,16 +100,18 @@ a {
 }
 
 #content {
-    min-width: 300px;
+    min-width: 250px;
     max-width: 900px;
     margin: auto;
     padding-top: 80px;
+    min-height: 600px;
 }
 
 #about {
     text-transform: uppercase;
     font-size: 12px;
     line-height: 22px;
+    display: none; /* hide for now */
 }
 
 #nowPlaying{
@@ -165,7 +171,7 @@ input[type=checkbox] {
     width: 100%;
     cursor: pointer;
     text-transform: uppercase;
-    line-height: 50px;
+    line-height: 52px;
 }
 
 label {

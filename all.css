@@ -3,7 +3,7 @@ body {
     font-weight: 200;
     color:#000;
     background: url("background.png");
-    background-repeat: no-repeat;
+    background-repeat: repeat;
     background-size: 100% auto;
 }
 
@@ -13,7 +13,7 @@ body {
   }
 }
 @media screen and (max-width: 900px) {
-  #share {
+  #volume_control {
       display: none;
   }
 
@@ -26,6 +26,20 @@ body {
   #evolution_percentage_indicator {
       width: 45%!important;
   }
+}
+
+@media screen and (max-width: 600px) {
+    #share {
+        display: none;
+    }
+
+    #title {
+        font-size: 18px!important;
+    }
+
+    #content {
+        padding-top: 30px!important;
+    }
 }
 
 a {
@@ -78,7 +92,7 @@ a {
 
 #attributionList {
     font-size: 14px;
-    line-height: 38px;
+    line-height: 40px;
     /*max-height: 300px;
     overflow: scroll;*/
     text-transform: uppercase;

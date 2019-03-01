@@ -15,7 +15,7 @@ body {
 
 @media screen and (max-aspect-ratio: 570/300) {
   body {
-    background-size: auto 200%;
+    background-size: auto 300%;
   }
 }
 

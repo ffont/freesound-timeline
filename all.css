@@ -25,20 +25,12 @@ body {
       margin-bottom: 30px!important;
       width: 30%!important;
   }
-
-  #evolution_percentage_indicator {
-      width: 550px!important;
-  }
 }
 
 @media screen and (max-width: 800px) {
     #volume_control {
       display: none;
     }
-
-    #evolution_percentage_indicator {
-      width: 350px!important;
-   }
 }
 
 @media screen and (max-width: 600px) {
@@ -61,7 +53,7 @@ body {
     }
 
     #evolution_percentage_indicator {
-      width: 50px!important;
+      /*width: 50px!important;*/
     }
 
     .ckecboxlabel {
@@ -219,14 +211,16 @@ button {
     display: none;
 }
 
+#buttonsLeft {
+    width: 100px;
+}
+
 #evolution_percentage_indicator {
     display: none; /* must be set to inline-block in code  */
-    width: 700px;
+    width: 100%;
     height: 1px;
     background-color: #000;
-    margin-bottom: 19px;
-    margin-left: 10px;
-    margin-right: 10px;
+    margin-bottom: 8px;
 }
 
 #evolution_percentage_indicator_loader {
@@ -236,6 +230,12 @@ button {
     border: 1px solid #000;
     margin-top: -1px;
 }
+
+#buttonsRight {
+    text-align: right;
+    width: 55px;
+}
+
 @keyframes flash_input {
     from { background-color: #ffc9cf; }
     to { background-color: transparent; }

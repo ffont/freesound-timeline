@@ -94,7 +94,6 @@ function playSound(name, url) {
     // again after some time.
     if (100.0 * Math.random() >= (100.0 - soundscape_compleixty)) {
         clearPlayTimersForSound(url); // Remove existing play timer for this sound (if any)
-        document.getElementById("nowPlaying").innerHTML = 'Now Playing: ' +  name;
         var element_playing_indicator_id = 'play_placeholder_' + url;
         showPlayingIndicator(element_playing_indicator_id);
         am.playSoundFromURL(url, 0, {
@@ -196,7 +195,6 @@ function stopAllSounds() {
     // Update UI
     document.getElementById("stop_button").style.display = 'none';
     document.getElementById("play_button").style.display = 'inline-block';
-    document.getElementById("nowPlaying").innerHTML = '';
     
     var elems = document.getElementsByClassName("play_placeholder");
     for (var i = 0; i < elems.length; i++) {

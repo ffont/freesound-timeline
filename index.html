@@ -23,15 +23,23 @@
 			<div id="content">
 
 				<div id="transport">
-					<button onclick="previous()"><img class="button-img" src="prev_button.png" /></button>
-					<button id="play_button" onclick="play()"><img class="button-img" src="play_button.png" /></button>
-					<button id="stop_button" onclick="panic()"><img class="button-img" src="stop_button.png" /></button>
-					<div id="evolution_percentage_indicator">
-						<div id="evolution_percentage_indicator_loader"></div>
-					</div>
-					<button onclick="next()"><img class="button-img" src="next_button.png" /></button>
+					<table style="width: 100%;"><tr>
+						<td id="buttonsLeft">
+							<button id="previous_button" onclick="previous()"><img class="button-img" src="prev_button.png" /></button>
+							<button id="play_button" onclick="play()"><img class="button-img" src="play_button.png" /></button>
+							<button id="stop_button" onclick="panic()"><img class="button-img" src="stop_button.png" /></button>
+						</td>
+						
+						<td>
+							<div id="evolution_percentage_indicator">
+								<div id="evolution_percentage_indicator_loader"></div>
+							</div>
+						</td>
 
-					<div id="nowPlaying"></div>
+						<td id="buttonsRight">
+							<button id="next_button" onclick="next()"><img class="button-img" src="next_button.png" /></button>
+						</td>
+					</tr></table>
 				</div>
 
 				<div class="controls">

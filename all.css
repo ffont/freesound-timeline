@@ -245,6 +245,7 @@ button {
 }
 
 .inputDiv input {
-    background-color: green;
+    background-color: yellow;
     margin-left: 0px;
+    padding-left: 0px;
 }

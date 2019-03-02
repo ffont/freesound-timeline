@@ -45,6 +45,10 @@ body {
     #content {
         padding-top: 30px!important;
     }
+
+    #wrapper {
+        padding: 20px!important;
+    }   
 }
 
 a {

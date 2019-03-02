@@ -28,15 +28,14 @@ body {
     }
 }
 
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 400px) {
     #share {
         display: none;
     }
 
     .control {
-      /*display: block!important;*/
-      margin-bottom: 30px!important;
-      width: 45%!important;
+        margin-bottom: 30px!important;
+        width: 45%!important;
     }
 
     #title {
@@ -45,14 +44,6 @@ body {
 
     #content {
         padding-top: 30px!important;
-    }
-
-    #evolution_percentage_indicator {
-      /*width: 50px!important;*/
-    }
-
-    .ckecboxlabel {
-        padding-left: 16px;
     }
 }
 

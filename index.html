@@ -44,43 +44,43 @@
 
 				<div class="controls">
 					<div class="control">
-						<div>
+						<div class="labelDiv">
 							<label for="year">Year</label>
 						</div>
-						<div>
+						<div class="inputDiv"> 
 							<input class="input_focus_enter" type="text" name="year" id="year" min="2005" max="9999" step="1" maxlength="4" onkeypress='return event.charCode >= 48 && event.charCode <= 57' onchange="setHash()">
 						</div>
 					</div>
 					<div class="control">
-						<div>
+						<div class="labelDiv">
 							<label for="month">Month</label>
 						</div>
-						<div>
+						<div class="inputDiv"> 
 							<input class="input_focus_enter" type="text" name="month" id="month" min="1" max="12" step="1" maxlength="2" onkeypress='return event.charCode >= 48 && event.charCode <= 57' onchange="setHash()">
 						</div>
 					</div>
 					<div class="control">
-						<div>
+						<div class="labelDiv">
 							<label for="complexity">Density</label>
 						</div>
-						<div>
+						<div class="inputDiv">
 							<input class="input_focus_enter" type="text" name="complexity" id="complexity" min="1" step="1" max="100" maxlength="3" onkeypress='return event.charCode >= 48 && event.charCode <= 57' onchange="setComplexity()">
 						</div>
 					</div>
 					<div class="control">
-						<div>
+						<div class="labelDiv">
 							<label for="alternative">Alternate</label>
 						</div>
-						<div>
+						<div class="inputDiv">
 							<span id="alternate_label" class="ckecboxlabel" onclick="toggleAlternativeCheckbox()">OFF</span>
 							<input type="checkbox" name="alternative" id="alternative">
 						</div>
 					</div>
 					<div class="control">
-						<div>
+						<div class="labelDiv">
 							<label for="auto_advance">Autoadvance</label>
 						</div>
-						<div>
+						<div class="inputDiv">
 							<span id="autoadvance_label" class="ckecboxlabel" onclick="toggleAutoAdvanceCheckbox()">ON</span>
 							<input type="checkbox" name="auto_advance" id="auto_advance" checked>
 						</div>

@@ -7,16 +7,11 @@ body {
     /*background-size: 100% auto;*/
 }
 
-@media screen and (max-aspect-ratio: 3360/2112) {
-  body {
-    /*background-size: auto 200%;*/
-  }
-}
 
-@media screen and (max-aspect-ratio: 570/300) {
-  body {
-    /*background-size: auto 300%;*/
-  }
+@media screen and (max-aspect-ratio: 1/1) {
+    body {
+        background: url("background2.png");
+    }
 }
 
 @media screen and (max-width: 1000px) {

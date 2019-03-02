@@ -235,3 +235,16 @@ button {
     animation-name: flash_input;
     animation-duration: 0ms;  /* set to 0 to have no effect */
 }
+
+.labelDiv {
+}
+
+.inputDiv {
+    overflow: hidden;
+    height:45px;
+}
+
+.inputDiv input {
+    background-color: green;
+    margin-left: 0px;
+}

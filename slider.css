@@ -90,13 +90,3 @@ input[type=range]:focus::-ms-fill-lower {
 input[type=range]:focus::-ms-fill-upper {
     background: transparent;
 }
-
-.labelDiv {
-    background-color: red;
-}
-
-.inputDiv {
-    background-color: green;
-    overflow: hidden;
-    height:45px;
-}

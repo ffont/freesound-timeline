@@ -227,13 +227,13 @@ button {
 }
 
 @keyframes flash_input {
-    from { background-color: #ffc9cf; }
-    to { background-color: transparent; }
+    from { opacity: 0; }
+    to { opacity: 1; }
     
 }
 .flash_input {
     animation-name: flash_input;
-    animation-duration: 0ms;  /* set to 0 to have no effect */
+    animation-duration: 900ms;  /* set to 0 to have no effect */
 }
 
 .labelDiv {

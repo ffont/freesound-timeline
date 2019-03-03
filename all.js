@@ -370,7 +370,13 @@ function displayFlashNextMonth() {
 
 // Button interactions
 
+function play_button(){
+    document.getElementById('play_button').classList.add('flash_input'); // Add flash effect on press
+    play();
+}
+
 function play() {
+
     //document.getElementById('attributionList').innerHTML = '';
     lazyInitAudioManager(); // Init audio context here in response to user action
     stopAllSounds();
@@ -414,6 +420,8 @@ function play() {
 }
 
 function next() {
+    document.getElementById('next_button').classList.add('flash_input'); // Add flash effect on press
+
     var month = document.getElementById('month').value;
     var year = document.getElementById('year').value;
     document.getElementById('month').value = getNextMonth(month);
@@ -430,6 +438,8 @@ function next() {
 }
 
 function previous() {
+    document.getElementById('previous_button').classList.add('flash_input'); // Add flash effect on press
+
     var month = document.getElementById('month').value;
     var year = document.getElementById('year').value;
     document.getElementById('month').value = getPreviousMonth(month);
@@ -515,6 +525,11 @@ function setPopularityMeasure() {
     }
 
     setHash();  // Update hash
+}
+
+function panic_button(){
+    document.getElementById('stop_button').classList.add('flash_input'); // Add flash effect on press
+    panic();
 }
 
 function panic() {

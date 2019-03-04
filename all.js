@@ -31,15 +31,9 @@ window.onload = function () {
             randomMonth = 3;
         }
     } else if (randomYear === currentYear) {
-        if (randomMonth >= (new Date()).getMonth()) {
-            randomMonth = (new Date()).getMonth() - 1;
+        if (randomMonth >= (new Date()).getMonth() + 1) {
+            randomMonth = (new Date()).getMonth() + 1;
         }
-    }
-    if (randomMonth === 0){
-        randomMonth = 1;
-    }
-    if (randomMonth > 12) {
-        randomMonth = 12;
     }
     document.getElementById('year').value = randomYear;
     document.getElementById('month').value = randomMonth;
@@ -48,14 +42,49 @@ window.onload = function () {
 
     parseHashAndSetParams();
     
+    setButtonFlashEvents();
+};
+
+function setButtonFlashEvents(){
+    // Need to remove flash efects class so it can be repeated
+
     var elems = document.getElementsByClassName('input_focus_enter');
     for (var i = 0; i < elems.length; i++) {
         elems[i].addEventListener('keyup', function (e) {
-            if (e.which == 13) this.blur();
+            if (e.which == 13) {
+                this.blur();
+                this.classList.add('flash_input');
+            }
+        });
+        elems[i].addEventListener('animationend', function (e) {
+            this.classList.remove('flash_input');
         });
     }
-    
-};
+
+    document.getElementById('next_button').addEventListener('animationend', function (e) {
+        this.classList.remove('flash_input');
+    });
+
+    document.getElementById('previous_button').addEventListener('animationend', function (e) {
+        this.classList.remove('flash_input');
+    });
+
+    document.getElementById('play_button').addEventListener('animationend', function (e) {
+        this.classList.remove('flash_input');
+    });
+
+    document.getElementById('stop_button').addEventListener('animationend', function (e) {
+        this.classList.remove('flash_input');
+    });
+
+    document.getElementById('alternate_label').addEventListener('animationend', function (e) {
+        this.classList.remove('flash_input');
+    });
+
+    document.getElementById('autoadvance_label').addEventListener('animationend', function (e) {
+        this.classList.remove('flash_input');
+    });
+}
 
 function initSoundArrays() {
     currentlyPlayedSounds = [];
@@ -288,6 +317,17 @@ function parseHashAndSetParams() {
     }
 }
 
+function monthChange(){
+    var element = document.getElementById('month');
+    if (element.value < 1){
+        element.value = 1;
+    }
+    if (element.value > 12) {
+        element.value = 12;
+    }
+    setHash();
+}
+
 function setHash() {
     var hash = document.getElementById('month').value + ',' +
         document.getElementById('year').value + ',' +
@@ -357,17 +397,7 @@ function hideEvolutionProgress() {
 }
 
 function displayFlashNextMonth() {
-    // Input elements need to be removed and re-added for the flash effect to work every time
-    // See: https://css-tricks.com/restart-css-animation/
-
-    var month_input = document.getElementById('month');
-    var new_month_input = month_input.cloneNode(true);
-    month_input.parentNode.replaceChild(new_month_input, month_input);
     document.getElementById('month').classList.add('flash_input');
-
-    var year_input = document.getElementById('year');
-    var new_year_input = year_input.cloneNode(true);
-    year_input.parentNode.replaceChild(new_year_input, year_input);
     document.getElementById('year').classList.add('flash_input');
 }
 
@@ -466,8 +496,14 @@ function previous() {
 }
 
 function setComplexity() {
-    var value = document.getElementById('complexity').value;
-    soundscape_compleixty = value;
+    var element = document.getElementById('complexity');
+    if (element.value < 5){
+        element.value = 5;
+    }
+    if (element.value > 100) {
+        element.value = 100;
+    }
+    soundscape_compleixty = element.value;
     setHash();
 }
 
@@ -692,6 +728,7 @@ function toggleAlternativeCheckbox() {
     // OFF = ratings, ON = downloads
     var checkbox = document.getElementById('alternative');
     var label = document.getElementById('alternate_label');
+    label.classList.add('flash_input');
     if (checkbox.checked == true){
         label.innerHTML = ratings_mode_label;
         checkbox.checked = false;
@@ -705,6 +742,7 @@ function toggleAlternativeCheckbox() {
 function toggleAutoAdvanceCheckbox() {
     var checkbox = document.getElementById('auto_advance');
     var label = document.getElementById('autoadvance_label');
+    label.classList.add('flash_input');
     if (checkbox.checked == true) {
         label.innerHTML = 'off';
         checkbox.checked = false;

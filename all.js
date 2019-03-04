@@ -393,7 +393,7 @@ function displayEvolutionProgress() {
 }
 
 function hideEvolutionProgress() {
-    document.getElementById('evolution_percentage_indicator').style.display = 'none';
+    //document.getElementById('evolution_percentage_indicator').style.display = 'none';
 }
 
 function displayFlashNextMonth() {

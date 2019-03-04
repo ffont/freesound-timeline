@@ -13,8 +13,8 @@ var evolutionTimer = undefined;
 var evolutionCurrentStep = 0;
 var evolutionResolution = 100; // Number of steps per month
 var evolutionTimeInterval = (90 * 1000) / evolutionResolution; // How long it takes for a full month to evolve to the next
-var ratings_mode_label = 'r';
-var downloads_mode_label = 'd';
+var ratings_mode_label = 'rt';
+var downloads_mode_label = 'dl';
 
 
 window.onload = function () {
@@ -43,6 +43,8 @@ window.onload = function () {
     }
     document.getElementById('year').value = randomYear;
     document.getElementById('month').value = randomMonth;
+
+    document.getElementById('alternate_label').innerHTML = ratings_mode_label; // set by default
 
     parseHashAndSetParams();
     

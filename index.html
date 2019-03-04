@@ -25,7 +25,7 @@
 				<div id="transport">
 					<table style="width: 100%;"><tr>
 						<td id="buttonsLeft">
-							<button id="previous_button" onclick="previous()"><img class="button-img" src="prev_button.png" /></button>
+							<button id="previous_button" onclick="previous_button()"><img class="button-img" src="prev_button.png" /></button>
 							<button id="play_button" onclick="play_button()"><img class="button-img" src="play_button.png" /></button>
 							<button id="stop_button" onclick="panic_button()"><img class="button-img" src="stop_button.png" /></button>
 						</td>
@@ -37,7 +37,7 @@
 						</td>
 
 						<td id="buttonsRight">
-							<button id="next_button" onclick="next()"><img class="button-img" src="next_button.png" /></button>
+							<button id="next_button" onclick="next_button()"><img class="button-img" src="next_button.png" /></button>
 						</td>
 					</tr></table>
 				</div>
@@ -69,10 +69,10 @@
 					</div>
 					<div class="control">
 						<div class="labelDiv">
-							<label for="alternative">Alternate</label>
+							<label for="alternative">Mode</label>
 						</div>
 						<div class="inputDiv">
-							<span id="alternate_label" class="ckecboxlabel" onclick="toggleAlternativeCheckbox()">OFF</span>
+							<span id="alternate_label" class="ckecboxlabel" onclick="toggleAlternativeCheckbox()">r</span> <!-- OFF = ratings, ON = downloads -->
 							<input type="checkbox" name="alternative" id="alternative">
 						</div>
 					</div>

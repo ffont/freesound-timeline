@@ -13,6 +13,8 @@ var evolutionTimer = undefined;
 var evolutionCurrentStep = 0;
 var evolutionResolution = 100; // Number of steps per month
 var evolutionTimeInterval = (90 * 1000) / evolutionResolution; // How long it takes for a full month to evolve to the next
+var ratings_mode_label = 'r';
+var downloads_mode_label = 'd';
 
 
 window.onload = function () {
@@ -256,10 +258,10 @@ function parseHashAndSetParams() {
     }
     if (alternative == 'true') {
         document.getElementById("alternative").checked = true;
-        document.getElementById('alternate_label').innerHTML = 'on';
+        document.getElementById('alternate_label').innerHTML = downloads_mode_label;
     } else if (alternative == 'false') {
         document.getElementById("alternative").checked = false;
-        document.getElementById('alternate_label').innerHTML = 'off';;
+        document.getElementById('alternate_label').innerHTML = ratings_mode_label;
     }
     if (complexity) {
         soundscape_compleixty = complexity;
@@ -419,9 +421,12 @@ function play() {
     });
 }
 
-function next() {
+function next_button(){
     document.getElementById('next_button').classList.add('flash_input'); // Add flash effect on press
+    next();
+}
 
+function next() {
     var month = document.getElementById('month').value;
     var year = document.getElementById('year').value;
     document.getElementById('month').value = getNextMonth(month);
@@ -437,9 +442,12 @@ function next() {
     play();
 }
 
-function previous() {
+function previous_button(){
     document.getElementById('previous_button').classList.add('flash_input'); // Add flash effect on press
+    previous();
+}
 
+function previous() {
     var month = document.getElementById('month').value;
     var year = document.getElementById('year').value;
     document.getElementById('month').value = getPreviousMonth(month);
@@ -679,13 +687,14 @@ function stopEvolution() {
 }
 
 function toggleAlternativeCheckbox() {
+    // OFF = ratings, ON = downloads
     var checkbox = document.getElementById('alternative');
     var label = document.getElementById('alternate_label');
     if (checkbox.checked == true){
-        label.innerHTML = 'off';
+        label.innerHTML = ratings_mode_label;
         checkbox.checked = false;
     } else {
-        label.innerHTML = 'on';
+        label.innerHTML = downloads_mode_label;
         checkbox.checked = true;
     }
     setPopularityMeasure();

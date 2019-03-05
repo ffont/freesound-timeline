@@ -44,16 +44,29 @@ window.onload = function () {
     
     setButtonFlashEvents();
 
-    configureBackground("movingbg");
-    configureBackground("movingbg2");
+    // Configure bg moving. Only start animation if using safari (others seem slow...)
+    var isOpera = (!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
+    var isFirefox = typeof InstallTrigger !== 'undefined';
+    var isSafari = /constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || (typeof safari !== 'undefined' && safari.pushNotification));
+    var isIE = /*@cc_on!@*/false || !!document.documentMode;
+    var isEdge = !isIE && !!window.StyleMedia;
+    var isChrome = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
 
+    var bg1isStatic = true;
+    var bg2isStatic = true;
+    if (isSafari){
+        bg1isStatic = false;
+    }
+
+    configureBackground("movingbg", bg1isStatic);
+    configureBackground("movingbg2", bg2isStatic);
     window.addEventListener('resize', function (event) {
-        configureBackground("movingbg");
-        configureBackground("movingbg2");
+        configureBackground("movingbg", bg1isStatic);
+        configureBackground("movingbg2", bg2isStatic);
     });
 };
 
-function configureBackground(bgElementId){
+function configureBackground(bgElementId, isStatic){
     var ww = window.innerWidth;
     var wh = window.innerHeight;
     var extraScaleFactor = Math.random() * 1 + 2; // Add some randomeness in bg
@@ -82,6 +95,9 @@ function configureBackground(bgElementId){
     element.style.animationIterationCount = 'infinite';
     element.style.animationDirection = (Math.random() > 0.5) ? 'normal' : 'reverse';
     element.style.animationDelay = animationDelay.toString() + 's';
+    if (isStatic === true){
+        element.style.animationPlayState = 'paused';
+    }
 }
 
 function setButtonFlashEvents(){

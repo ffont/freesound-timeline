@@ -250,7 +250,7 @@ button {
   position:fixed;
   z-index: -1;
   scroll-behavior: none;
-  opacity: 0.5;
+  opacity: 0.7;
   /* the rest is set in code */
 }
 
@@ -258,6 +258,6 @@ button {
   position:fixed;
   z-index: -1;
   scroll-behavior: none;
-  opacity: 0.5;
+  opacity: 0.7;
   /* the rest is set in code */
 }

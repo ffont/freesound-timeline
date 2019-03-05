@@ -46,7 +46,7 @@ window.onload = function () {
 
     configureBackground("movingbg");
     configureBackground("movingbg2");
-    
+
     window.addEventListener('resize', function (event) {
         configureBackground("movingbg");
         configureBackground("movingbg2");

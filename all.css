@@ -168,6 +168,10 @@ button {
     padding: 0px;
 }
 
+button:focus {
+    outline: none;
+}
+
 .button-img {
     height: 40px;
     width: 40px;

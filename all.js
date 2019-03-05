@@ -806,3 +806,16 @@ function toggleAutoAdvanceCheckbox() {
 function share(){
     alert('Share by copying this URL:\n' + location.href);
 }
+
+function start_recording(){
+    am.startRecording();
+}
+
+function stop_recording() {
+    var filename = 'freesound_timeline_export-';
+    var hash = location.hash;
+    hash = hash.replace(new RegExp(',', 'g'), '-');
+    hash = hash.replace(new RegExp('#', 'g'), '');
+    filename += hash;
+    am.stopRecording(filename);
+}

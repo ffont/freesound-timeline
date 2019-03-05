@@ -18,14 +18,24 @@ function log(message) {
 
 
 // "Private" interface (don't use these methods directly outside audioengine.js)
+const recbufferLen = 4096;
+var rec = undefined;
 
 function startAudioContext(){
     context = new (window.AudioContext || window.webkitAudioContext)();
     if (!context.createGain)
       context.createGain = context.createGainNode;
     context.gainNode = context.createGain();
+    if (!context.createScriptProcessor) {
+      context.recNode = context.createJavaScriptNode(recbufferLen, 2, 0);
+    } else {
+      context.recNode = context.createScriptProcessor(recbufferLen, 2, 0);
+    }
     context.gainNode.connect(context.destination);
-    context.listener.setOrientation(0, 0, -1, 0, 1, 0); // Set default listener orientation at the centre
+
+    rec = new Recorder(context.gainNode, {  // init recorder
+      bufferLen: recbufferLen
+    })
 }
 
 function playBuffer(buffer, time, options) {
@@ -127,7 +137,6 @@ BufferLoader.prototype.load = function() {
   for (var i = 0; i < this.urlList.length; ++i)
   this.loadBuffer(this.urlList[i], i);
 };
-
 
 // Public interface (AudioManager object)
 
@@ -236,6 +245,19 @@ AudioManager.prototype.getAllUniqueBufferNodesList = function(value) {
     }
   }
   return keys;
+}
+
+AudioManager.prototype.startRecording = function () {
+  rec.record();
+}
+
+AudioManager.prototype.stopRecording = function (downloadFilename) {
+  rec.stop();
+
+  rec.exportWAV(function (audioBlob){
+    Recorder.forceDownload(audioBlob, downloadFilename);
+    rec.clear();
+  }); 
 }
 
 // Initialize things

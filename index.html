@@ -39,7 +39,7 @@
 				<span id="volume_control">
 					<img class="speaker-img" src="speaker.png" /><input id="volume" type="range" min=0.0 max=1.0 step='.05' value=1.0 oninput="setVolume()" onchange="setVolume()">
 				</span>
-				<a href="javascript:void(0);" onclick="share();">Share</a> <a href="https://labs.freesound.org/apps/freesound-timeline.html" target="_blank">?</a>
+				<a href="javascript:void(0);" onclick="share();">Share</a>
 			</div>
 			<br style="clear: both;">
 			<div id="content">
@@ -112,20 +112,10 @@
 					please <b>use headphones</b> for the full experience
 				</div>
 				<div id="about">
-					Freesound Timeline is a app that I originally implemented in 2011 when I was starting to learn about web technologies. 
-					In 2018 I updated it to make use <a href="https://freesound.org" target="_blank">Freesound</a> APIv2 and the Web Audio API, and to add new killer features such as random 
-					spacialization of sounds in a 3D space (using WebAudio's HRTF panning), and the <i>autoadvance</i> mode to let Freesound Timeline
-					automatically advance through Freesound history. Want to contribute? <a
-					href="http://github.com/ffont/freesound-timeline" target="_blank">visit the code repository</a>.
-
-					<!--
-					This is a very simple hack that gets the most popular sounds in <a href="https://freesound.org"
-					target="_blank">Freesound</a> for a given
-					year and month and plays them all at once (in loop). Use the density slider to adjust the complexity of the
-					generated soundscape. Copy the URL to share the soundscape with your friends. <br><b>EDIT</b>: added a new
-					killer feature which allows you to automatically advance in time and explore Freesound history in a sort of
-					"radio" mode. Just check the "auto-advance" checkbox and enjoy.
-					-->
+					Freesound Timeline automatically generates soundscapes using the most popular sounds from <a href="https://freesound.org" target="_blank">Freesound</a>
+					for a given year and month. I originally implemented Freesound Timeline back in 2011 when I was starting to learn about web technologies. 
+					Later in 2018 and 2019 I added some new cool features and the new shinny interface. Want to know more or need some help? Here you'll find
+					<a href="https://labs.freesound.org/apps/freesound-timeline.html" target="_blank">more information</a>.
 				</div>
 			</div>
 		</div>

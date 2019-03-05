@@ -43,7 +43,43 @@ window.onload = function () {
     parseHashAndSetParams();
     
     setButtonFlashEvents();
+
+    configureBackground();
+    window.addEventListener('resize', function (event) {
+        configureBackground();
+    });
 };
+
+function configureBackground(){
+    var ww = window.innerWidth;
+    var wh = window.innerHeight;
+    var extraScaleFactor = Math.random() * 2 + 1.5; // Add some randomeness in bg
+    var width = ww * extraScaleFactor;
+    var height = wh * extraScaleFactor;
+    if (width > height) {
+        height = width;
+    } else {
+        width = height;
+    }
+    var top = (wh/2) - height/2;
+    var left = (ww/2) - width/2;
+    var time = 60;
+    var animationDelay = - (Math.random() * time).toFixed(0);
+
+    var element = document.getElementById("movingbg");
+    element.style.top = top.toString() + 'px';
+    element.style.left = left.toString() + 'px';
+    element.style.width = width.toString() + 'px';
+    element.style.height = height.toString() + 'px';
+    element.style.background = 'url("background.png")';
+    element.style.backgroundSize = width.toString() + 'px ' + height.toString() + 'px';
+    element.style.animation = 'bg-slide';
+    element.style.animationDuration = time.toString() + 's';
+    element.style.animationTimingFunction = 'linear';
+    element.style.animationIterationCount = 'infinite';
+    element.style.animationDirection = (Math.random() > 0.5) ? 'normal' : 'reverse';
+    element.style.animationDelay = animationDelay.toString() + 's';
+}
 
 function setButtonFlashEvents(){
     // Need to remove flash efects class so it can be repeated

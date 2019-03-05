@@ -2,16 +2,7 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, 'Helvetica', sans-serif;
     font-weight: 200;
     color:#000;
-    background: url("background.png");
-    background-repeat: repeat;
-    /*background-size: 100% auto;*/
-}
-
-
-@media screen and (max-aspect-ratio: 1/1) {
-    body {
-        background: url("background2.png");
-    }
+    background-color: rgb(249, 218, 89);
 }
 
 @media screen and (max-width: 1000px) {
@@ -86,7 +77,6 @@ a {
     max-width: 900px;
     margin: auto;
     padding-top: 80px;
-    min-height: 600px;
 }
 
 #about {
@@ -247,4 +237,18 @@ button {
 .inputDiv input {
     margin-left: 0px;
     padding-left: 0px;
+}
+
+/* BG animations */
+
+@keyframes bg-slide {
+   0%  { transform: rotate(0deg); }
+   100% { transform: rotate(360deg); }
+}
+
+#movingbg {
+  position:fixed;
+  z-index: -1;
+  scroll-behavior: none;
+  /* the rest is set in code */
 }

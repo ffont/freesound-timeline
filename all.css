@@ -250,5 +250,14 @@ button {
   position:fixed;
   z-index: -1;
   scroll-behavior: none;
+  opacity: 0.5;
+  /* the rest is set in code */
+}
+
+#movingbg2 {
+  position:fixed;
+  z-index: -1;
+  scroll-behavior: none;
+  opacity: 0.5;
   /* the rest is set in code */
 }

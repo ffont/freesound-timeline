@@ -44,16 +44,18 @@ window.onload = function () {
     
     setButtonFlashEvents();
 
-    configureBackground();
+    configureBackground("movingbg");
+    configureBackground("movingbg2");
     window.addEventListener('resize', function (event) {
-        configureBackground();
+        configureBackground("movingbg");
+        configureBackground("movingbg2");
     });
 };
 
-function configureBackground(){
+function configureBackground(bgElementId){
     var ww = window.innerWidth;
     var wh = window.innerHeight;
-    var extraScaleFactor = Math.random() * 2 + 1.5; // Add some randomeness in bg
+    var extraScaleFactor = Math.random() * 1 + 2; // Add some randomeness in bg
     var width = ww * extraScaleFactor;
     var height = wh * extraScaleFactor;
     if (width > height) {
@@ -66,7 +68,7 @@ function configureBackground(){
     var time = 60;
     var animationDelay = - (Math.random() * time).toFixed(0);
 
-    var element = document.getElementById("movingbg");
+    var element = document.getElementById(bgElementId);
     element.style.top = top.toString() + 'px';
     element.style.left = left.toString() + 'px';
     element.style.width = width.toString() + 'px';

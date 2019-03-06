@@ -179,10 +179,14 @@ function lazyInitAudioManager() {
     }
 }
 
+function getPlayingIndicatorHTML() {
+    return '<img class="playing-indicator-img" src="speaker.png" />';
+}
+
 function showPlayingIndicator(elementID) {
     var playing_indicator_element = document.getElementById(elementID);
     if (playing_indicator_element !== null) {
-        playing_indicator_element.innerHTML = '<img class="playing-indicator-img" src="speaker.png" />';
+        playing_indicator_element.innerHTML = getPlayingIndicatorHTML();
     }
 }
 
@@ -258,18 +262,25 @@ function playCurrentSounds() {
     }
 
     // 3) Update attribution list accordingly
-    document.getElementById('attributionList').innerHTML = '';
+    var currentAttributionListElement = document.getElementById('attributionList');
+    var newAttributionListInnerHTML = '';
     for (i in currentlyPlayedSounds) {
         var snd = currentlyPlayedSounds[i];
-        var label = '<a href="' + snd.url + '" target="_blank" class="soundname">' + snd.name + '</a> by <span class="username">' + snd.username + '</span><span class="play_placeholder" id="play_placeholder_' + snd.previews['preview-hq-mp3'] + '"></span>';
-        document.getElementById('attributionList').innerHTML +=
-            label + '<br>'// + ' | <a href="' + snd.license + '" target="_blank" class="licensename">' + getLicenseName(snd.license) + '</a><br>'
-
+        var sound_div_id = "sound_" + snd.id;
+        var play_placeholder_id = 'play_placeholder_' + snd.previews['preview-hq-mp3'];
+        var soundPlayingIndicatorIsOn = (document.getElementById(play_placeholder_id) !== null) && (document.getElementById(play_placeholder_id).innerHTML !== '');
+        play_placeholder_content = '';
+        if (soundPlayingIndicatorIsOn) {
+            play_placeholder_content = getPlayingIndicatorHTML();
+        }
+        var label = '<div id="' + sound_div_id + '"><a href="' + snd.url + '" target="_blank" class="soundname">' + snd.name + '</a> by <span class="username">' + snd.username + '</span><span class="play_placeholder" id="' + play_placeholder_id + '">' + play_placeholder_content + '</span></div>';
+        newAttributionListInnerHTML += label;
+        
         if (full_attribution_list.indexOf(label) === -1) {
             full_attribution_list.push(label)
         }
     }
-
+    document.getElementById('attributionList').innerHTML = newAttributionListInnerHTML;
 }
 
 function clearPlayTimersForSound(url) {
@@ -684,7 +695,11 @@ function search(month, year, onSuccess, onFailure) {
             }
         }
     );
-    document.getElementById("attributionList").innerHTML = "Waiting for results...";
+
+    if (document.getElementById("attributionList").innerHTML.indexOf('use headphones') > -1){
+        // Show waiting for resutls only the first time
+        document.getElementById("attributionList").innerHTML = "Waiting for results...";
+    }
 }
 
 // Evolution

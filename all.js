@@ -841,7 +841,12 @@ function toggleAutoAdvanceCheckbox() {
 }
 
 function share(){
-    alert('Share by copying this URL:\n' + location.href);
+    var urlToCopy = location.href;
+    var textElement = document.getElementById('clipboardURL');
+    textElement.value = urlToCopy;    
+    textElement.select();
+    document.execCommand("copy");
+    alert('Share link coppied to clipboard:\n' + urlToCopy);
 }
 
 var isRecording = false;

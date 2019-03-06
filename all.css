@@ -66,6 +66,10 @@ a {
     height:27px;
 }
 
+#title a {
+    text-decoration: none;
+}
+
 #share {
     float: right;
     text-transform: uppercase;

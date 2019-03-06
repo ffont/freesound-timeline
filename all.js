@@ -68,7 +68,10 @@ window.onload = function () {
 
     // Adjust background size for first time
     configureBackground("movingbg", bg1isStatic);
-    configureBackground("movingbg2", bg2isStatic);
+    if (!isSafari){
+        configureBackground("movingbg2", bg2isStatic);
+    }
+    
 
     // Trigger events for re-adjusting window size when needed
     window.addEventListener('resize', function (event) {
@@ -76,7 +79,9 @@ window.onload = function () {
         resizeTimer = setTimeout(function () {
             if ((window.innerWidth !== currentWindowWidth)){
                 configureBackground("movingbg", bg1isStatic);
-                configureBackground("movingbg2", bg2isStatic);
+                if (!isSafari) {
+                    configureBackground("movingbg2", bg2isStatic);
+                }
                 currentWindowWidth = window.innerWidth;
                 currentWindowHeight = window.innerHeight;
             }
@@ -105,7 +110,7 @@ function configureBackground(bgElementId, isStatic){
     element.style.left = left.toString() + 'px';
     element.style.width = width.toString() + 'px';
     element.style.height = height.toString() + 'px';
-    element.style.background = 'url("background.png")';
+    element.style.background = 'url("background2.png")';
     element.style.backgroundSize = width.toString() + 'px ' + height.toString() + 'px';
     element.style.animation = 'bg-slide';
     element.style.animationDuration = time.toString() + 's';

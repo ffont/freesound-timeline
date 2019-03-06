@@ -16,6 +16,10 @@ var evolutionTimeInterval = (90 * 1000) / evolutionResolution; // How long it ta
 var ratings_mode_label = 'rt';
 var downloads_mode_label = 'dl';
 
+var currentWindowWidth;
+var currentWindowHeight;
+var resizeTimer;
+
 
 window.onload = function () {
     freesound.setToken("d31c795be3f70f7f04b21aeca4c5b48a599db6e9");
@@ -53,11 +57,24 @@ window.onload = function () {
         bg1isStatic = false;
     }
 
+    currentWindowWidth = window.innerWidth;
+    currentWindowHeight = window.innerHeight;
+
+    // Adjust background size for first time
     configureBackground("movingbg", bg1isStatic);
     configureBackground("movingbg2", bg2isStatic);
+
+    // Trigger events for re-adjusting window size when needed
     window.addEventListener('resize', function (event) {
-        configureBackground("movingbg", bg1isStatic);
-        configureBackground("movingbg2", bg2isStatic);
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(function () {
+            if ((window.innerWidth !== currentWindowWidth)){
+                configureBackground("movingbg", bg1isStatic);
+                configureBackground("movingbg2", bg2isStatic);
+                currentWindowWidth = window.innerWidth;
+                currentWindowHeight = window.innerHeight;
+            }
+        }, 250);
     });
 };
 

@@ -42,11 +42,17 @@ window.onload = function () {
     document.getElementById('year').value = randomYear;
     document.getElementById('month').value = randomMonth;
 
+    document.getElementById('volume').value = 0.75;
     document.getElementById('alternate_label').innerHTML = ratings_mode_label; // set by default
 
     parseHashAndSetParams();
-    
     setButtonFlashEvents();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const recordParameter = urlParams.get('record');
+    if (recordParameter !== null){
+        showRecordButton(); // Enable redcording mode
+    }
 
     // Configure bg moving. Only start animation if using safari (others seem slow...)
     var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
@@ -169,7 +175,6 @@ function lazyInitAudioManager() {
     // is only played when users have made some interactions
     if (am === undefined) {
         am = initAudioManager();
-        document.getElementById('volume').value = 0.5;
         setVolume();
     }
 }
@@ -824,15 +829,38 @@ function share(){
     alert('Share by copying this URL:\n' + location.href);
 }
 
+var isRecording = false;
+
 function start_recording(){
+    lazyInitAudioManager();
+    isRecording = true;
     am.startRecording();
 }
 
 function stop_recording() {
+    isRecording = false;
     var filename = 'freesound_timeline_export-';
     var hash = location.hash;
     hash = hash.replace(new RegExp(',', 'g'), '-');
     hash = hash.replace(new RegExp('#', 'g'), '');
     filename += hash;
     am.stopRecording(filename);
+}
+
+function record_button() {
+    var buttonElement = document.getElementById("record_button");
+    if (isRecording){
+        stop_recording();
+        buttonElement.classList.remove('flash_input_infinite');
+    } else {
+        start_recording();
+        buttonElement.classList.add('flash_input_infinite');
+    }
+}
+
+function showRecordButton() {
+    var buttonElement = document.getElementById("record_button");
+    buttonElement.style.display = 'inline-block';
+    var buttonsLeftEelement = document.getElementById("buttonsLeft");
+    buttonsLeftEelement.style.width = '150px';
 }

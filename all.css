@@ -202,6 +202,10 @@ button:focus {
     width: 100px;
 }
 
+#record_button {
+    display: none;
+}
+
 #evolution_percentage_indicator {
     display: none; /* must be set to inline-block in code  */
     width: 100%;
@@ -228,9 +232,17 @@ button:focus {
     to { opacity: 1; }
     
 }
+
 .flash_input {
     animation-name: flash_input;
     animation-duration: 900ms;  /* set to 0 to have no effect */
+}
+
+.flash_input_infinite {
+    animation-name: flash_input;
+    animation-duration: 900ms;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
 }
 
 .labelDiv {

@@ -406,6 +406,12 @@ function parseHashAndSetParams() {
     }
 }
 
+function yearChange(){
+    var element = document.getElementById('year');
+    setHash();
+    play();  // Sync to current date
+}
+
 function monthChange(){
     var element = document.getElementById('month');
     if (element.value < 1){
@@ -415,6 +421,7 @@ function monthChange(){
         element.value = 12;
     }
     setHash();
+    play();  // Sync to current date
 }
 
 function setHash() {

@@ -43,6 +43,7 @@
 				<span id="volume_control">
 					<img class="speaker-img" src="speaker.png" /><input id="volume" type="range" min=0.0 max=1.0 step='.05' value=1.0 oninput="setVolume()" onchange="setVolume()">
 				</span>
+				<a href="javascript:void(0);" onclick="toggleHelp();">HELP</a>
 				<!--<a href="javascript:void(0);" onclick="share();">Share</a>-->
 			</div>
 			<br style="clear: both;">
@@ -121,6 +122,27 @@
 					for a given year and month. Freesound Timeline has been develoepd by Frederic Font at the MTG-UPF. 
 					The interface has been designed by Tony Martinez.
 				</div>
+			</div>
+		</div>
+		<div id="help">
+			<div id="innerHelp">
+				<span class="helpTitle">How is this supposed to work?</span>
+				<ul>
+					<li>
+						<p>Choose a <strong>year</strong> an and a <strong>month</strong> and hit the play button. Freesound Timeline will start playing a soundscape based on <i>popular</i> sounds added to Freesound during that year and month.</p>
+					</li>
+					<li>
+						<p>Set the <strong>density</strong> to a value between 5 and 100. The higher the value, the more <em>dense</em> will be the generated soundscape (i.e. more sounds playing at the same time).</p>
+					</li>
+					<li>
+						<p>Switch between <strong>RT</strong> and <strong>DL</strong> modes to change the way in which Freesound Timeline chooses the most popular sounds for a given month an year. <em>DL</em> mode will select sounds based on number of downloads. <em>RT</em> will do it based on average rating.</p>
+					</li>
+					<li>
+						<p>Turn <strong>autoadvance</strong> mode on or off to let Freesound Timeline slowly move ahead in time starting on the year and month you previously selected.</p>
+					</li>
+				</ul>
+				<br><br>
+				<a href="javascript:void(0);" onclick="toggleHelp();">got it</a>
 			</div>
 		</div>
 	</body>

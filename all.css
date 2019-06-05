@@ -297,3 +297,38 @@ button:focus {
 #clipboardPlaceholder {
     opacity: 0.0;
 }
+
+#help {
+    background-color: rgba(0, 0, 0, 0.80);
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.helpTitle {
+    font-size: 18px!important;
+    text-transform: uppercase;
+    margin-bottom: 30px;
+    display: block;
+}
+
+#innerHelp {
+    text-align: center;
+    color: white;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 10%;
+    width: 600px;
+    height: 300px;
+    text-transform: uppercase;
+    font-size: 12px;
+    line-height: 22px;
+}
+
+#innerHelp a {
+    color: white;
+    font-weight: 300;
+}

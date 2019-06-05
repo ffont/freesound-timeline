@@ -896,3 +896,13 @@ function showRecordButton() {
     var buttonsLeftEelement = document.getElementById("buttonsLeft");
     buttonsLeftEelement.style.width = '150px';
 }
+
+function toggleHelp() {
+    var helpElement = document.getElementById("help");
+    console.log(helpElement.style.display)
+    if ((helpElement.style.display === 'none') || ((helpElement.style.display === ''))){
+        helpElement.style.display = 'block';
+    } else {
+        helpElement.style.display = 'none';
+    }
+}

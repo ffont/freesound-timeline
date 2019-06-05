@@ -278,7 +278,7 @@ function playCurrentSounds() {
         if (soundPlayingIndicatorIsOn) {
             play_placeholder_content = getPlayingIndicatorHTML();
         }
-        var label = '<div id="' + sound_div_id + '"><a href="' + snd.url + '" target="_blank" class="soundname">' + snd.name + '</a> by <span class="username">' + snd.username + '</span><span class="play_placeholder" id="' + play_placeholder_id + '">' + play_placeholder_content + '</span></div>';
+        var label = '<div id="' + sound_div_id + '"><span class="soundname">' + snd.name + '</span> by <span class="username">' + snd.username + '</span><span class="play_placeholder" id="' + play_placeholder_id + '">' + play_placeholder_content + '</span></div>';
         newAttributionListInnerHTML += label;
         
         if (full_attribution_list.indexOf(label) === -1) {

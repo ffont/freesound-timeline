@@ -97,13 +97,13 @@ a {
 }
 
 #attributionList {
-    font-size: 14px;
-    line-height: 40px;
+    font-size: 12px;
+    line-height: 34px;
     /*max-height: 300px;
     overflow: scroll;*/
     text-transform: uppercase;
-    margin-top: 50px;
-    margin-bottom: 40px;
+    margin-top: 30px;
+    margin-bottom: 20px;
 }
 
 .username {

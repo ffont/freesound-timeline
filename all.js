@@ -42,7 +42,7 @@ window.onload = function () {
     document.getElementById('year').value = randomYear;
     document.getElementById('month').value = randomMonth;
 
-    document.getElementById('volume').value = 0.75;
+    document.getElementById('volume').value = 0.25;
     document.getElementById('alternate_label').innerHTML = ratings_mode_label; // set by default
 
     parseHashAndSetParams();

@@ -408,7 +408,7 @@ function parseHashAndSetParams() {
 
 function yearChange(){
     var element = document.getElementById('year');
-    setHash();
+    stopAndResetEvolutionIdRunning();
     play();  // Sync to current date
 }
 
@@ -420,7 +420,7 @@ function monthChange(){
     if (element.value > 12) {
         element.value = 12;
     }
-    setHash();
+    stopAndResetEvolutionIdRunning();
     play();  // Sync to current date
 }
 
@@ -497,6 +497,15 @@ function displayFlashNextMonth() {
     document.getElementById('year').classList.add('flash_input');
 }
 
+function stopAndResetEvolutionIdRunning() {
+    if (evolutionTimer !== undefined) {
+        // If evolution is running stop it and set step to 0
+        stopEvolution();
+        hideEvolutionProgress();
+    }
+    evolutionCurrentStep = 0;
+}
+
 
 // Button interactions
 
@@ -561,12 +570,7 @@ function next() {
     document.getElementById('year').value = getNextYear(year, month);
     displayFlashNextMonth();
     setHash();
-    if (evolutionTimer !== undefined) {
-        // If evolution is running stop it and set step to 0
-        stopEvolution();
-        hideEvolutionProgress();
-    }
-    evolutionCurrentStep = 0;
+    stopAndResetEvolutionIdRunning();
     play();
 }
 
@@ -582,12 +586,7 @@ function previous() {
     document.getElementById('year').value = getPreviousYear(year, month);
     displayFlashNextMonth();
     setHash();
-    if (evolutionTimer !== undefined) {
-        // If evolution is running stop it and set step to 0
-        stopEvolution();
-        hideEvolutionProgress();
-    }
-    evolutionCurrentStep = 0;
+    stopAndResetEvolutionIdRunning();
     play();
 }
 

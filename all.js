@@ -62,6 +62,7 @@ window.onload = function () {
     if (isSafari){
         bg1isStatic = false;
     }
+    bg1isStatic = false; // Hardcode bg moving
 
     currentWindowWidth = window.innerWidth;
     currentWindowHeight = window.innerHeight;

@@ -46,6 +46,13 @@ a {
     color: #000; 
     text-decoration: underline;
     font-weight: 300;
+    font-size:120%;
+}
+
+.link_style {
+    color: #000; 
+    text-decoration: underline;
+    font-weight: 300;
 }
 
 #wrapper {
